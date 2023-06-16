@@ -11,6 +11,9 @@
         <SingleProject>true</SingleProject>
         <ImplicitUsings>enable</ImplicitUsings>
         <EnableDefaultCssItems>false</EnableDefaultCssItems>
+		
+		<!--Tailwind setup-->
+		<NpmLastInstall>node_modules/./last-install</NpmLastInstall>
 
         <!-- Display name -->
         <ApplicationTitle>data-sense-blazor</ApplicationTitle>
@@ -53,5 +56,22 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
         <PackageReference Include="MudBlazor" Version="6.4.1" />
     </ItemGroup>
+
+	<Target Name="CheckNpmIsInstalled" BeforeTargets="InstallNPM">
+		<Exec Command="npm -v" ContinueOnError="true">
+			<Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+		</Exec>
+	
+	<Error Condition="'$(ErrorCode)' != '0'" Text="You must install npm to run this task" />
+	</Target>
+	<Target Name="InstallNPM" BeforeTargets="BuildTailwindCSS">
+		<Exec Command="npm install" />
+	<Touch Files="$(NpmLastInstall)" AlwaysCreate="true" />
+	</Target>
+	
+	<Target Name="BuildTailwindCSS" BeforeTargets="Compile">
+		<Exec Command="npm run buildcss:debug" Condition="'$(Configuration)' == 'Debug'" />
+		<Exec Command="npm run buildcss:release" Condition="'$(Configuration)' == 'Release'" />
+	</Target>
 
 </Project>
