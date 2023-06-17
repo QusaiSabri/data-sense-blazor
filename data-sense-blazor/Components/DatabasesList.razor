@@ -1,0 +1,74 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using MudBlazor
+@using data_sense_blazor.Services;
+@inject SQLServerDatabaseService DatabaseService
+@*@inject IConfiguration Configuration;*@
+
+<MudPaper Class="w-fit" Elevation="0">
+    <MudTreeView Items="TreeItems" MultiSelection="true" @bind-ActivatedValue="ActivatedValue" @bind-SelectedValues="SelectedValues">
+        <ItemTemplate>
+            <MudTreeViewItem @bind-Expanded="@context.IsExpanded" Items="@context.TreeItems" Value="@context"
+                             Icon="@context.Icon" Text="@context.Title" EndText="@context.DataType" EndTextTypo="@Typo.caption" />
+                            
+        </ItemTemplate>
+    </MudTreeView>
+</MudPaper>
+
+
+    @code {
+
+    private string _connString;
+    private TreeItemData ActivatedValue { get; set; }
+
+    private HashSet<TreeItemData> SelectedValues { get; set; }
+
+    private HashSet<TreeItemData> TreeItems { get; set; } = new HashSet<TreeItemData>();
+
+    public class TreeItemData
+    {
+        public string Title { get; set; }
+        public string Icon { get; set; }
+        public string DataType { get; set; } // Add DataType to represent a Column's data type
+        public bool IsNullable { get; set; } // Add IsNullable to represent a Column's nullable status
+        public bool IsExpanded { get; set; }
+        public HashSet<TreeItemData> TreeItems { get; set; }
+
+        public TreeItemData(string title, string icon, string dataType = null, bool isNullable = false)
+        {
+            Title = title;
+            Icon = icon;
+            DataType = dataType;
+            IsNullable = isNullable;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        //_connString = Configuration.GetConnectionString("DefaultConnection");
+        var databases = DatabaseService.GetDatabases();
+        foreach (var database in databases)
+        {
+            var databaseItem = new TreeItemData(database.Name, Icons.Material.Filled.Dataset) // Assume you have an appropriate icon
+                {
+                    IsExpanded = true,
+                    TreeItems = new HashSet<TreeItemData>()
+                };
+            foreach (var table in database.Tables)
+            {
+                var tableItem = new TreeItemData(table.Name, Icons.Material.Filled.TableRows) // Assume you have an appropriate icon
+                    {
+                        IsExpanded = true,
+                        TreeItems = new HashSet<TreeItemData>()
+                    };
+                foreach (var column in table.Columns)
+                {
+                    var columnItem = new TreeItemData(column.Name, Icons.Material.Filled.ViewColumn, column.DataType, column.IsNullable); // Assume you have an appropriate icon
+                    tableItem.TreeItems.Add(columnItem);
+                }
+                databaseItem.TreeItems.Add(tableItem);
+            }
+            TreeItems.Add(databaseItem);
+        }
+    }
+
+}

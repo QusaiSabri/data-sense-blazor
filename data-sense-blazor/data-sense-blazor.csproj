@@ -53,8 +53,30 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
         <PackageReference Include="MudBlazor" Version="6.4.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="wwwroot\appsettings.Designer.cs">
+        <DesignTimeSharedInput>True</DesignTimeSharedInput>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>appsettings.json</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\appsettings.local.Designer.cs">
+        <DesignTimeSharedInput>True</DesignTimeSharedInput>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>appsettings.local.json</DependentUpon>
+      </Content>
+      <Content Update="wwwroot\appsettings.local.json">
+        <LastGenOutput>appsettings.local.Designer.cs</LastGenOutput>
+        <Generator>SettingsSingleFileGenerator</Generator>
+      </Content>
+      <Content Update="wwwroot\appsettings.json">
+        <Generator>SettingsSingleFileGenerator</Generator>
+        <LastGenOutput>appsettings.Designer.cs</LastGenOutput>
+      </Content>
     </ItemGroup>
 
 	<Target Name="CheckNpmIsInstalled" BeforeTargets="InstallNPM">
