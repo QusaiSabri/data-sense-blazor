@@ -1,8 +1,22 @@
 ﻿@page "/"
 
-<h1 class="text-4xl font-bold my-8">Hello, world!</h1>
 
-Welcome to your new app.
+<MudGrid Spacing="2" Justify="Justify.FlexStart">
+    <MudItem xs="2" Class="bg-red-500">
+    
+    </MudItem>
+    <MudItem xs="10">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=8</MudPaper>
+    </MudItem>
+</MudGrid>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    bool open = false;
+    bool dense = false;
+    bool preserveOpenState = false;
 
+    void ToggleDrawer()
+    {
+        open = !open;
+    }
+}
