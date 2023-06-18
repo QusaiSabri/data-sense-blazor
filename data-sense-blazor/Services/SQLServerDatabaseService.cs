@@ -7,7 +7,10 @@ namespace data_sense_blazor.Services
     public class SQLServerDatabaseService : IDatabaseService
     {
         private readonly string _connectionString;
-        public SQLServerDatabaseService(string connectionString = "Server=.;Database=.;Trusted_Connection=true;TrustServerCertificate=true;")
+        //public SQLServerDatabaseService(string connectionString = "Server=SERVERNAME;Database=DATABASENAME;User Id=***;Password=*****;Trusted_Connection=true;TrustServerCertificate=true;")
+        public SQLServerDatabaseService(string connectionString = "Server=SERVERNAME;Database=DATABASENAME;User Id=**;Password=*****;TrustServerCertificate=true;")
+            
+
         {
             _connectionString = connectionString;
         }
@@ -19,7 +22,7 @@ namespace data_sense_blazor.Services
             {
                 connection.Open();
 
-                using (var command = new SqlCommand("SELECT name FROM sys.databases where name = '.';", connection))
+                using (var command = new SqlCommand("SELECT name FROM sys.databases where name = 'DATABASENAME';", connection))
                 {
                     using (var reader = command.ExecuteReader())
                     {
