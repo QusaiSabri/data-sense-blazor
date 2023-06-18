@@ -404,3 +404,5 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 /data-sense-blazor/wwwroot/appsettings.local.json
+/data-sense-blazor/wwwroot/css/tailwind.debug.css
+/data-sense-blazor/wwwroot/css/tailwind.debug.css
