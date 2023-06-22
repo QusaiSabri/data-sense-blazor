@@ -1,107 +1,106 @@
 ﻿using data_sense_blazor.Interfaces;
 using data_sense_blazor.Models;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
-namespace data_sense_blazor.Services
+public class SQLServerDatabaseService : IDatabaseService
 {
-    public class SQLServerDatabaseService : IDatabaseService
+    private readonly string _connectionString;
+    //public SQLServerDatabaseService(string connectionString = "Server=SERVERNAME;Database=DATABASENAME;User Id=***;Password=*****;Trusted_Connection=true;TrustServerCertificate=true;")
+    public SQLServerDatabaseService(string connectionString = "Server=SERVERNAME;Database=DATABASENAME;User Id=XXX;Password=******;TrustServerCertificate=true;")
     {
-        private readonly string _connectionString;
-        //public SQLServerDatabaseService(string connectionString = "Server=SERVERNAME;Database=DATABASENAME;User Id=***;Password=*****;Trusted_Connection=true;TrustServerCertificate=true;")
-        public SQLServerDatabaseService(string connectionString = "Server=SERVERNAME;Database=DATABASENAME;User Id=**;Password=*****;TrustServerCertificate=true;")
-            
+        _connectionString = connectionString;
+    }
 
-        {
-            _connectionString = connectionString;
-        }
-        public List<Database> GetDatabases()
-        {
-            var databases = new List<Database>();
+    public async Task<List<Database>> GetDatabases()
+    {
+        var databases = new List<Database>();
 
-            using (var connection = new SqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            await connection.OpenAsync();
+
+            using (var command = new SqlCommand("SELECT name FROM sys.databases;", connection))
             {
-                connection.Open();
-
-                using (var command = new SqlCommand("SELECT name FROM sys.databases where name = 'DATABASENAME';", connection))
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    using (var reader = command.ExecuteReader())
+                    while (await reader.ReadAsync())
                     {
-                        while (reader.Read())
+                        var database = new Database
                         {
-                            var database = new Database
-                            {
-                                Name = reader.GetString(0),
-                                Tables = GetTables(_connectionString, reader.GetString(0))
-                            };
+                            Name = reader.GetString(0),
+                            //Tables = await GetTables(reader.GetString(0))
+                        };
 
-                            databases.Add(database);
-                        }
+                        databases.Add(database);
                     }
                 }
             }
-
-            return databases;
         }
 
-        public List<Table> GetTables(string connectionString, string databaseName)
+        return databases;
+    }
+
+    public async Task<List<Table>> GetTables(string databaseName)
+    {
+        var tables = new List<Table>();
+
+        using (var connection = new SqlConnection(_connectionString))
         {
-            var tables = new List<Table>();
+            await connection.OpenAsync();
 
-            using (var connection = new SqlConnection(connectionString))
+            using (var command = new SqlCommand($"USE {databaseName}; SELECT name FROM sys.tables;", connection))
             {
-                connection.Open();
-
-                using (var command = new SqlCommand($"USE {databaseName}; SELECT name FROM sys.tables;", connection))
+                using (var reader = await command.ExecuteReaderAsync())
                 {
-                    using (var reader = command.ExecuteReader())
+                    while (await reader.ReadAsync())
                     {
-                        while (reader.Read())
+                        var table = new Table
                         {
-                            var table = new Table
-                            {
-                                Name = reader.GetString(0),
-                                Columns = GetColumns(connectionString, databaseName, reader.GetString(0)) // Get columns for each table
-                            };
+                            Name = reader.GetString(0)
+                        };
 
-                            tables.Add(table);
-                        }
+                        tables.Add(table);
                     }
                 }
             }
-
-            return tables;
         }
 
+        return tables;
+    }
 
-        public List<Column> GetColumns(string connectionString, string databaseName, string tableName)
+    public async Task<List<Column>> GetColumns(string databaseName, string tableName)
+    {
+        var columns = new List<Column>();
+
+        using (var connection = new SqlConnection(_connectionString))
         {
-            var columns = new List<Column>();
+            await connection.OpenAsync();
 
-            using (var connection = new SqlConnection(connectionString))
+            using (var command = new SqlCommand($"USE {databaseName}; SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = @TableName;", connection))
             {
-                connection.Open();
-
-                using (var command = new SqlCommand($"USE {databaseName}; SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{tableName}';", connection))
+                command.Parameters.AddRange(new[]
                 {
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            var column = new Column
-                            {
-                                Name = reader.GetString(0),
-                                DataType = reader.GetString(1),
-                                IsNullable = reader.GetString(2) == "YES"
-                            };
+                    new SqlParameter("@TableName", SqlDbType.NVarChar) { Value = tableName }
+                });
 
-                            columns.Add(column);
-                        }
+                using (var reader = await command.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var column = new Column
+                        {
+                            Name = reader.GetString(0),
+                            DataType = reader.GetString(1),
+                            IsNullable = reader.GetString(2) == "YES"
+                        };
+
+                        columns.Add(column);
                     }
                 }
             }
-
-            return columns;
         }
 
+        return columns;
     }
 }

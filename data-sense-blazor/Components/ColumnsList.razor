@@ -1,0 +1,38 @@
+﻿@using data_sense_blazor.Interfaces;
+@using data_sense_blazor.Models;
+@inject SQLServerDatabaseService DatabaseService;
+
+
+@if (columns != null)
+{
+    <MudStack Class="w-full">
+        @foreach (var column in columns)
+        {
+            <div class="flex justify-between w-full p-2">
+                <div>@column.Name</div>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary">Preview</MudButton>
+            </div>
+            @*<MudDivider/>*@
+        }
+    </MudStack>
+}
+
+
+@code {
+    private string _selectedTable;
+    [Parameter]
+    public string SelectedTable { get; set; }
+    [Parameter]
+    public string SelectedDatabase { get; set; }
+
+    private List<Column> columns;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SelectedTable != _selectedTable)
+        {
+            columns = await DatabaseService.GetColumns(SelectedDatabase, SelectedTable);
+            _selectedTable = SelectedTable;
+        }
+    }
+}

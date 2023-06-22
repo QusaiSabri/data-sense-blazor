@@ -1,0 +1,40 @@
+﻿@using Microsoft.Extensions.Configuration;
+@using MudBlazor;
+@using data_sense_blazor.Models;
+@using data_sense_blazor.Services;
+@inject SQLServerDatabaseService DatabaseService;
+
+<MudAutocomplete T="string" Label="Tables" @bind-Value="SelectedTable" SearchFunc="@SearchFunc" Variant="Variant.Outlined" />
+@if (!string.IsNullOrEmpty(SelectedTable))
+{
+    <ColumnsList SelectedDatabase="@SelectedDatabase" SelectedTable="@SelectedTable" />
+}
+
+@code {
+    private string _selectedDatabase;
+    [Parameter]
+    public string SelectedDatabase { get; set; }
+    private string SelectedTable;
+    private List<string> tables;
+    private Func<string, Task<IEnumerable<string>>> SearchFunc;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SelectedDatabase != _selectedDatabase)
+        {
+            SelectedTable = null;
+            tables = (await DatabaseService.GetTables(SelectedDatabase)).Select(db => db.Name).ToList();
+            _selectedDatabase = SelectedDatabase;
+        }
+
+        SearchFunc = value =>
+        {
+            if (string.IsNullOrEmpty(value))
+                return Task.FromResult(tables.AsEnumerable());
+
+            var res = tables.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+
+            return Task.FromResult(res.AsEnumerable());
+        };
+    }
+}

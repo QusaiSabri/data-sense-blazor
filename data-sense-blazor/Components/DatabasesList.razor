@@ -28,8 +28,8 @@
     {
         public string Title { get; set; }
         public string Icon { get; set; }
-        public string DataType { get; set; } // Add DataType to represent a Column's data type
-        public bool IsNullable { get; set; } // Add IsNullable to represent a Column's nullable status
+        public string DataType { get; set; }
+        public bool IsNullable { get; set; }
         public bool IsExpanded { get; set; }
         public HashSet<TreeItemData> TreeItems { get; set; }
 
@@ -42,27 +42,27 @@
         }
     }
 
-    protected override void OnInitialized()
+    protected override async void OnInitialized()
     {
         //_connString = Configuration.GetConnectionString("DefaultConnection");
-        var databases = DatabaseService.GetDatabases();
+        var databases = await DatabaseService.GetDatabases();
         foreach (var database in databases)
         {
-            var databaseItem = new TreeItemData(database.Name, Icons.Material.Filled.Dataset) // Assume you have an appropriate icon
+            var databaseItem = new TreeItemData(database.Name, Icons.Material.Filled.Dataset)
                 {
                     IsExpanded = true,
                     TreeItems = new HashSet<TreeItemData>()
                 };
             foreach (var table in database.Tables)
             {
-                var tableItem = new TreeItemData(table.Name, Icons.Material.Filled.TableRows) // Assume you have an appropriate icon
+                var tableItem = new TreeItemData(table.Name, Icons.Material.Filled.TableRows)
                     {
                         IsExpanded = true,
                         TreeItems = new HashSet<TreeItemData>()
                     };
                 foreach (var column in table.Columns)
                 {
-                    var columnItem = new TreeItemData(column.Name, Icons.Material.Filled.ViewColumn, column.DataType, column.IsNullable); // Assume you have an appropriate icon
+                    var columnItem = new TreeItemData(column.Name, Icons.Material.Filled.ViewColumn, column.DataType, column.IsNullable);
                     tableItem.TreeItems.Add(columnItem);
                 }
                 databaseItem.TreeItems.Add(tableItem);
