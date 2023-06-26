@@ -1,8 +1,6 @@
 ﻿using data_sense_blazor.Data;
-using data_sense_blazor.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui.Controls;
 using MudBlazor.Services;
 
 namespace data_sense_blazor;

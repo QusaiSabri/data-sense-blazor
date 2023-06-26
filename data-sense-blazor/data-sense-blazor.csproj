@@ -56,17 +56,14 @@
         <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
         <PackageReference Include="MudBlazor" Version="6.4.1" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="appsettings.local.Designer.cs">
-        <DesignTimeSharedInput>True</DesignTimeSharedInput>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>appsettings.local.json</DependentUpon>
-      </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
+      <Content Update="appsettings.local.json">
+        <LastGenOutput>appsettings - Copy.Designer.cs</LastGenOutput>
+        <Generator>SettingsSingleFileGenerator</Generator>
+      </Content>
       <Content Update="appsettings.json">
         <LastGenOutput>appsettings.Designer.cs</LastGenOutput>
         <Generator>SettingsSingleFileGenerator</Generator>
