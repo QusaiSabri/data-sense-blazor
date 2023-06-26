@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace data_sense_blazor.wwwroot {
+namespace data_sense_blazor {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

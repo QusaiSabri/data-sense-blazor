@@ -1,13 +1,14 @@
 ﻿using data_sense_blazor.Interfaces;
 using data_sense_blazor.Models;
 using Microsoft.Data.SqlClient;
+using System.Configuration;
 using System.Data;
 
 public class SQLServerDatabaseService : IDatabaseService
 {
     private readonly string _connectionString;
-    //public SQLServerDatabaseService(string connectionString = "Server=SERVERNAME;Database=DATABASENAME;User Id=***;Password=*****;Trusted_Connection=true;TrustServerCertificate=true;")
-    public SQLServerDatabaseService(string connectionString = "Server=SERVERNAME;Database=DATABASENAME;User Id=XXX;Password=******;TrustServerCertificate=true;")
+   
+    public SQLServerDatabaseService(string connectionString)
     {
         _connectionString = connectionString;
     }

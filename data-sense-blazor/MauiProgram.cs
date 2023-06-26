@@ -1,6 +1,8 @@
 ﻿using data_sense_blazor.Data;
 using data_sense_blazor.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls;
 using MudBlazor.Services;
 
 namespace data_sense_blazor;
@@ -17,16 +19,19 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
             });
 
-        //var configurationBuilder = new ConfigurationBuilder()
-        //    .SetBasePath(Directory.GetCurrentDirectory())
-        //    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+        var configurationBuilder = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
 
-        //var configuration = configurationBuilder.Build();
+        IConfiguration configuration = configurationBuilder.Build();
 
-        //builder.Services.AddSingleton<IConfiguration>(configuration);
+        string connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        builder.Services.AddSingleton(s => new SQLServerDatabaseService(connectionString));
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddMudServices();
-        builder.Services.AddScoped<SQLServerDatabaseService>();
+        //builder.Services.AddScoped<SQLServerDatabaseService>();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();
@@ -36,6 +41,16 @@ public static class MauiProgram
         builder.Services.AddSingleton<WeatherForecastService>();
 
         return builder.Build();
+    }
+
+    private static async Task<IConfiguration> GetConfigurationAsync()
+    {
+        var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync("appsettings.json");
+        var stream = await response.Content.ReadAsStreamAsync();
+        return new ConfigurationBuilder()
+            .AddJsonStream(stream)
+            .Build();
     }
 }
 

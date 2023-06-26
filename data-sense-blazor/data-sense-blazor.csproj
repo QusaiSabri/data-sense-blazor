@@ -59,22 +59,23 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="wwwroot\appsettings.Designer.cs">
+      <Compile Update="appsettings.local.Designer.cs">
         <DesignTimeSharedInput>True</DesignTimeSharedInput>
         <AutoGen>True</AutoGen>
-        <DependentUpon>appsettings.json</DependentUpon>
-      </Content>
-      <Content Update="wwwroot\appsettings.local.Designer.cs">
-        <DesignTimeSharedInput>True</DesignTimeSharedInput>
         <DependentUpon>appsettings.local.json</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="appsettings.json">
+        <LastGenOutput>appsettings.Designer.cs</LastGenOutput>
+        <Generator>SettingsSingleFileGenerator</Generator>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Update="wwwroot\appsettings.local.json">
+      <Content Update="appsettings.local.json">
         <LastGenOutput>appsettings.local.Designer.cs</LastGenOutput>
         <Generator>SettingsSingleFileGenerator</Generator>
-      </Content>
-      <Content Update="wwwroot\appsettings.json">
-        <Generator>SettingsSingleFileGenerator</Generator>
-        <LastGenOutput>appsettings.Designer.cs</LastGenOutput>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
 
