@@ -4,9 +4,9 @@
 @using data_sense_blazor.Services;
 @inject SQLServerDatabaseService DatabaseService;
 
-<MudAutocomplete T="string" Label="Tables" @bind-Value="SelectedTable" SearchFunc="@SearchFunc" Variant="Variant.Outlined" />
+<MudAutocomplete T="string" Label="Tables" @bind-Value="SelectedTable" SearchFunc="@SearchFunc" Variant="Variant.Outlined" Class="mt-3" />
 @if (!string.IsNullOrEmpty(SelectedTable))
-{
+{       
     <ColumnsList SelectedDatabase="@SelectedDatabase" SelectedTable="@SelectedTable" />
 }
 

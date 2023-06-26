@@ -1,17 +1,24 @@
-﻿@using data_sense_blazor.Interfaces;
+﻿@using MudBlazor;
+@using data_sense_blazor.Interfaces;
 @using data_sense_blazor.Models;
 @inject SQLServerDatabaseService DatabaseService;
 
 
 @if (columns != null)
 {
-    <MudStack Class="w-full">
+    <MudStack Class="w-full mt-3" Spacing="0">
         @foreach (var column in columns)
         {
-            <div class="flex justify-between w-full p-2">
+            <MudField Variant="Variant.Outlined" InnerPadding="false">
+                <div class="flex justify-between w-full align-baseline p-2">
+                    @column.Name
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary">Preview</MudButton>
+                </div>
+            </MudField>
+            @*<div class="flex justify-between w-full p-2">
                 <div>@column.Name</div>
                 <MudButton Variant="Variant.Outlined" Color="Color.Primary">Preview</MudButton>
-            </div>
+            </div>*@
             @*<MudDivider/>*@
         }
     </MudStack>
@@ -26,6 +33,7 @@
     public string SelectedDatabase { get; set; }
 
     private List<Column> columns;
+
 
     protected override async Task OnParametersSetAsync()
     {
