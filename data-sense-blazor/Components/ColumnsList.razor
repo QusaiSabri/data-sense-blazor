@@ -3,27 +3,27 @@
 @using data_sense_blazor.Models;
 @inject SQLServerDatabaseService DatabaseService;
 
-
 @if (columns != null)
 {
-    <MudStack Class="w-full mt-3" Spacing="0">
+    <div class="mt-3 w-full">
         @foreach (var column in columns)
         {
-            <div class="grid grid-cols-6 gap-2 m-2">
-            <MudField Variant="Variant.Outlined" Class="col-span-3 m-0">
-                    @column.Name
-                </MudField><MudField Variant="Variant.Outlined" InnerPadding="false" Class="max-w-fit">
-                    <MudCheckBox @bind-Checked="@Basic_CheckBox2" Color="Color.Primary"></MudCheckBox>
-                </MudField>
-            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="col-span-2">Preview</MudButton>
-                 
-            
-            
-            </div>
+            <MudField Variant="Variant.Outlined" InnerPadding="false">
+                <div class="grid grid-cols-6 gap-2 items-center divide-x py-2 px-1">
+                    <div class="col-span-3">
+                        <p>@column.Name</p>
+                    </div>
+                    <div class="col-span-2">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="w-full">Preview</MudButton>
+                    </div>
+                    <div class="col-span-1">
+                        <MudCheckBox @bind-Checked="@column.IsChecked" Color="Color.Primary"></MudCheckBox>
+                    </div>
+                </div>
+            </MudField>
         }
-    </MudStack>
+    </div>
 }
-
 
 @code {
     private string _selectedTable;
@@ -34,7 +34,6 @@
 
     private List<Column> columns;
 
-    public bool Basic_CheckBox2 { get; set; } = false;
     protected override async Task OnParametersSetAsync()
     {
         if (SelectedTable != _selectedTable)
