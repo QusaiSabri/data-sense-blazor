@@ -9,17 +9,17 @@
     <MudStack Class="w-full mt-3" Spacing="0">
         @foreach (var column in columns)
         {
-            <MudField Variant="Variant.Outlined" InnerPadding="false">
-                <div class="flex justify-between w-full align-baseline p-2">
+            <div class="grid grid-cols-6 gap-2 m-2">
+            <MudField Variant="Variant.Outlined" Class="col-span-3 m-0">
                     @column.Name
-                    <MudButton Variant="Variant.Outlined" Color="Color.Primary">Preview</MudButton>
-                </div>
-            </MudField>
-            @*<div class="flex justify-between w-full p-2">
-                <div>@column.Name</div>
-                <MudButton Variant="Variant.Outlined" Color="Color.Primary">Preview</MudButton>
-            </div>*@
-            @*<MudDivider/>*@
+                </MudField><MudField Variant="Variant.Outlined" InnerPadding="false" Class="max-w-fit">
+                    <MudCheckBox @bind-Checked="@Basic_CheckBox2" Color="Color.Primary"></MudCheckBox>
+                </MudField>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="col-span-2">Preview</MudButton>
+                 
+            
+            
+            </div>
         }
     </MudStack>
 }
@@ -34,7 +34,7 @@
 
     private List<Column> columns;
 
-
+    public bool Basic_CheckBox2 { get; set; } = false;
     protected override async Task OnParametersSetAsync()
     {
         if (SelectedTable != _selectedTable)
