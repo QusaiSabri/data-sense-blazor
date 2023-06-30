@@ -3,8 +3,8 @@
 @using data_sense_blazor.Components
 
 
-<MudGrid Spacing="2" Justify="Justify.FlexStart" >
-    <MudItem xs="3">
+<MudGrid Spacing="2" Justify="Justify.FlexStart" Class="h-screen">
+    <MudItem xs="3" Class="overflow-auto" style="height: calc(100vh - 100px);">
         <MudStack >
         <MudPaper Elevation="25">
             <MudToolBar>
@@ -16,7 +16,6 @@
         <MudSpacer />
         <MudPaper Elevation="25">
             <DatabasesDropDown />
-            @*<DatabasesList/>*@
         </MudPaper>
         </MudStack>
     </MudItem>   
