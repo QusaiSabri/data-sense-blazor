@@ -408,3 +408,4 @@ ASALocalRun/
 /data-sense-blazor/wwwroot/css/tailwind.debug.css
 /data-sense-blazor/appsettings.local.json
 /data-sense-blazor/appsettings.Designer.cs
+/data-sense-blazor/wwwroot/js/bundle.iife.js
