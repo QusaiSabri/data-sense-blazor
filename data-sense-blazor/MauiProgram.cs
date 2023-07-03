@@ -40,15 +40,5 @@ public static class MauiProgram
 
         return builder.Build();
     }
-
-    private static async Task<IConfiguration> GetConfigurationAsync()
-    {
-        var httpClient = new HttpClient();
-        var response = await httpClient.GetAsync("appsettings.json");
-        var stream = await response.Content.ReadAsStreamAsync();
-        return new ConfigurationBuilder()
-            .AddJsonStream(stream)
-            .Build();
-    }
 }
 

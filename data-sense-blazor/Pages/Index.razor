@@ -1,51 +1,53 @@
 ﻿@page "/"
 @using MudBlazor
 @using data_sense_blazor.Components
+@inject IJSRuntime JS
 
 
-<MudGrid Spacing="2" Justify="Justify.FlexStart" Class="h-screen">
-    <MudItem xs="3" Class="overflow-auto" style="height: calc(100vh - 100px);">
-        <MudStack >
-        <MudPaper Elevation="25">
-            <MudToolBar>
-                <MudIconButton Icon="@Icons.Material.Outlined.PostAdd" Color="Color.Inherit" Class="mr-5" />                
-                <MudSpacer />                
-                <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
-            </MudToolBar>
-        </MudPaper>
-        <MudSpacer />
-        <MudPaper Elevation="25">
-            <DatabasesDropDown />
-        </MudPaper>
-        </MudStack>
-    </MudItem>   
-    <MudItem xs="9" Class="overflow-auto" style="height: calc(100vh - 100px);">
-        <MudContainer Fixed="true" Class="pb-4">
-            <MudPaper Elevation="25">
-                <MudToolBar Class="bg-blue-100">
-                    <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Add" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Settings" Color="Color.Inherit" />
-                    <MudSpacer />
-                    <MudIconButton Icon="@Icons.Material.Outlined.Notifications" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.PushPin" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" />
-                    <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
-                </MudToolBar>
-            </MudPaper>
-        </MudContainer>
-        <MudContainer Fixed="true">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=8</MudPaper>
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=8</MudPaper>
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=8</MudPaper>
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=8</MudPaper>
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=8</MudPaper>
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=8</MudPaper>
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">xs=8</MudPaper>
-        </MudContainer>
-    </MudItem>
+<MudGrid Spacing="2" Justify="Justify.FlexStart" Class="h-screen split flex-nowrap">
+    <div id="dataSenseLeftPane">
+        <MudItem xs="12" Class="overflow-auto" style="height: calc(100vh - 100px);">
+            <MudStack>
+                <MudPaper Elevation="25">
+                    <MudToolBar>
+                        <MudIconButton Icon="@Icons.Material.Outlined.PostAdd" Color="Color.Inherit" Class="mr-5" />
+                        <MudSpacer />
+                        <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
+                    </MudToolBar>
+                </MudPaper>
+                <MudSpacer />
+                <MudPaper Elevation="25">
+                    <DatabasesDropDown />
+                </MudPaper>
+            </MudStack>
+        </MudItem>
+    </div>
+    <div id="dataSenseRightPane">
+        <MudItem xs="12" Class="overflow-auto" style="height: calc(100vh - 100px);">
+            <div id="dataSenseTopRightPane">
+                <MudContainer Fixed="true" Class="pb-4">
+                    <MudPaper Elevation="25">
+                        <MudToolBar Class="bg-blue-100">
+                            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.Add" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.Settings" Color="Color.Inherit" />
+                            <MudSpacer />
+                            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.PushPin" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.PeopleAlt" />
+                            <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
+                        </MudToolBar>
+                    </MudPaper>
+                </MudContainer>
+            </div>
+            <div id="dataSenseBottomRightPane">
+                <MudContainer Fixed="true">
+                </MudContainer>
+            </div>
+        </MudItem>
+    </div>
 </MudGrid>
 
 @code {
@@ -57,4 +59,24 @@
     {
         open = !open;
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("setupSplit", new[] { new[] { "dataSenseLeftPane", "dataSenseRightPane" },
+                                                   new[] { "dataSenseTopRightPane", "dataSenseBottomRightPane" }
+        })
+             .AsTask()
+             .ContinueWith(task =>
+             {
+                 if (task.IsFaulted)
+                 {
+                     Console.Error.WriteLine(task.Exception.ToString());
+                 }
+             });
+
+        }
+    }
+
 }
