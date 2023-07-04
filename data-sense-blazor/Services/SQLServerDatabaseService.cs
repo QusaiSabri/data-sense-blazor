@@ -1,20 +1,25 @@
 ﻿using data_sense_blazor.Interfaces;
 using data_sense_blazor.Models;
 using Microsoft.Data.SqlClient;
-using System.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Data;
 
 public class SQLServerDatabaseService : IDatabaseService
 {
     private readonly string _connectionString;
-   
-    public SQLServerDatabaseService(string connectionString)
+    private readonly ILogger<SQLServerDatabaseService> _logger;
+
+    public SQLServerDatabaseService(string connectionString, ILogger<SQLServerDatabaseService> logger)
     {
         _connectionString = connectionString;
+        _logger = logger;
+        _logger.LogInformation("SQLServerDatabaseService started.");
     }
 
     public async Task<List<Database>> GetDatabases()
     {
+        _logger.LogInformation("Getting databases.");
+
         var databases = new List<Database>();
 
         using (var connection = new SqlConnection(_connectionString))
@@ -30,20 +35,23 @@ public class SQLServerDatabaseService : IDatabaseService
                         var database = new Database
                         {
                             Name = reader.GetString(0),
-                            //Tables = await GetTables(reader.GetString(0))
                         };
 
                         databases.Add(database);
+                        _logger.LogDebug("Added database: {database}", database.Name);
                     }
                 }
             }
         }
 
+        _logger.LogInformation("Finished getting databases.");
         return databases;
     }
 
     public async Task<List<Table>> GetTables(string databaseName)
     {
+        _logger.LogInformation("Getting tables for database: {databaseName}", databaseName);
+
         var tables = new List<Table>();
 
         using (var connection = new SqlConnection(_connectionString))
@@ -62,16 +70,20 @@ public class SQLServerDatabaseService : IDatabaseService
                         };
 
                         tables.Add(table);
+                        _logger.LogDebug("Added table: {table} to database: {databaseName}", table.Name, databaseName);
                     }
                 }
             }
         }
 
+        _logger.LogInformation("Finished getting tables for database: {databaseName}.", databaseName);
         return tables;
     }
 
     public async Task<List<Column>> GetColumns(string databaseName, string tableName)
     {
+        _logger.LogInformation("Getting columns for table: {tableName} in database: {databaseName}", tableName, databaseName);
+
         var columns = new List<Column>();
 
         using (var connection = new SqlConnection(_connectionString))
@@ -97,11 +109,13 @@ public class SQLServerDatabaseService : IDatabaseService
                         };
 
                         columns.Add(column);
+                        _logger.LogDebug("Added column: {column} to table: {tableName} in database: {databaseName}", column.Name, tableName, databaseName);
                     }
                 }
             }
         }
 
+        _logger.LogInformation("Finished getting columns for table: {tableName} in database: {databaseName}", tableName, databaseName);
         return columns;
     }
 }
