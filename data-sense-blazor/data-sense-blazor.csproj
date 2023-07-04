@@ -55,7 +55,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
-        <PackageReference Include="MudBlazor" Version="6.4.1" />
+        <PackageReference Include="MudBlazor" Version="6.6.0" />
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
     </ItemGroup>
 

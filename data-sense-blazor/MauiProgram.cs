@@ -26,7 +26,11 @@ public static class MauiProgram
 
         string connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        builder.Services.AddSingleton(s => new SQLServerDatabaseService(connectionString));
+        builder.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
+        builder.Services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+
+        // Provide ILogger when creating SQLServerDatabaseService singleton
+        builder.Services.AddSingleton(s => new SQLServerDatabaseService(connectionString, s.GetRequiredService<ILogger<SQLServerDatabaseService>>()));
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddMudServices();
         //builder.Services.AddScoped<SQLServerDatabaseService>();
