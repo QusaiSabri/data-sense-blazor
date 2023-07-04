@@ -1,13 +1,12 @@
-﻿using data_sense_blazor.Interfaces;
+﻿using System.Data;
+using data_sense_blazor.Interfaces;
 using data_sense_blazor.Models;
 using Microsoft.Data.SqlClient;
-using System.Configuration;
-using System.Data;
 
 public class SQLServerDatabaseService : IDatabaseService
 {
     private readonly string _connectionString;
-   
+
     public SQLServerDatabaseService(string connectionString)
     {
         _connectionString = connectionString;
@@ -103,5 +102,72 @@ public class SQLServerDatabaseService : IDatabaseService
         }
 
         return columns;
+    }
+
+    public async Task<DataTable> ExecuteQuery(string query)
+    {
+        var conn = new SqlConnection(_connectionString);
+        DataTable dataTable = new DataTable();
+
+        using (SqlCommand command = new SqlCommand(query, conn))
+        {
+            try
+            {
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    dataTable.Load(reader);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        return dataTable;
+    }
+
+    public async Task<DataTable> ExecuteGroupBy(string column, string table, string database)
+    {
+        var conn = new SqlConnection(_connectionString);
+
+        if (conn.State != ConnectionState.Open)
+        {
+            await conn.OpenAsync();
+        }
+
+        DataTable dataTable = new DataTable();
+        try
+        {
+            using (SqlCommand command = new SqlCommand("SELECT COUNT(*), @Column FROM @Database.@Table GROUP BY @Column", conn))
+            {
+                command.Parameters.AddWithValue("@Column", column);
+                command.Parameters.AddWithValue("@Table", table);
+                command.Parameters.AddWithValue("@Database", database);
+
+                using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    dataTable.Load(reader);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            if (conn.State == ConnectionState.Open)
+            {
+                conn.Close();
+            }
+        }
+
+        return dataTable;
     }
 }

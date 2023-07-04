@@ -14,7 +14,7 @@
                         <p class="overflow-hidden overflow-ellipsis">@column.Name</p>
                     </div>
                     <div class="col-span-2">
-                        <MudButton Variant="Variant.Outlined" Color="Color.Primary" Class="w-full">Preview</MudButton>
+                        <MudButton OnClick="() => OnPreviewButtonClicked()"  Variant="Variant.Outlined" Color="Color.Primary" Class="w-full">Preview</MudButton>
                     </div>
                     <div class="col-span-1">
                         <MudCheckBox @bind-Checked="@column.IsChecked" Color="Color.Primary" Class="items-center"></MudCheckBox>
@@ -41,5 +41,10 @@
             columns = await DatabaseService.GetColumns(SelectedDatabase, SelectedTable);
             _selectedTable = SelectedTable;
         }
+    }
+
+    private async Task OnPreviewButtonClicked()
+    {
+        var res = await DatabaseService.ExecuteGroupBy("Name", SelectedTable, SelectedDatabase);
     }
 }

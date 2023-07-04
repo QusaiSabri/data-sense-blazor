@@ -1,12 +1,14 @@
-﻿using data_sense_blazor.Models;
+﻿using System.Data;
+using data_sense_blazor.Models;
 
 namespace data_sense_blazor.Interfaces
 {
     public interface IDatabaseService
     {
-        public Task<List<Database>> GetDatabases();
-        public Task<List<Table>> GetTables(string databaseName);
-        public Task<List<Column>> GetColumns(string databaseName, string tableName);
-
+        Task<List<Database>> GetDatabases();
+        Task<List<Table>> GetTables(string databaseName);
+        Task<List<Column>> GetColumns(string databaseName, string tableName);
+        Task<DataTable> ExecuteQuery(string query);
+        Task<DataTable> ExecuteGroupBy(string column, string table, string database);
     }
 }
