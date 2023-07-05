@@ -1,0 +1,36 @@
+﻿@using MudBlazor
+@using data_sense_blazor.Services
+@using data_sense_blazor.Helpers
+@inject AppState AppState
+
+<MudTable Items="data">
+</MudTable>
+
+@code {
+    private List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
+
+    protected override void OnInitialized()
+    {
+        AppState.OnQueryResultChange += UpdateData;
+        UpdateData();
+    }
+
+    private void UpdateData()
+    {
+        if (AppState.QueryResult.Rows.Count > 0)
+        {
+            data = DataTableHelper.ConvertDataTable(AppState.QueryResult);
+        }
+        else
+        {
+            data = new List<Dictionary<string, object>>();
+        }
+
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        AppState.OnQueryResultChange -= UpdateData;
+    }
+}

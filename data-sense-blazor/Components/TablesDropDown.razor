@@ -4,9 +4,10 @@
 @using data_sense_blazor.Services;
 @inject SQLServerDatabaseService DatabaseService;
 
-<MudAutocomplete T="string" Label="Tables" @bind-Value="SelectedTable" SearchFunc="@SearchFunc" Variant="Variant.Outlined" Class="mt-3" Clearable=true Strict=false />
-@if (!string.IsNullOrEmpty(SelectedTable))
-{       
+<MudAutocomplete T="Table" Label="Tables" @bind-Value="SelectedTable" ToStringFunc="@((Table t) => t?.Name ?? "")" SearchFunc="@SearchFunc" Variant="Variant.Outlined" Class="mt-3" Clearable=true Strict=false />
+
+@if (SelectedTable != null)
+{
     <ColumnsList SelectedDatabase="@SelectedDatabase" SelectedTable="@SelectedTable" />
 }
 
@@ -14,16 +15,16 @@
     private string _selectedDatabase;
     [Parameter]
     public string SelectedDatabase { get; set; }
-    private string SelectedTable;
-    private List<string> tables;
-    private Func<string, Task<IEnumerable<string>>> SearchFunc;
+    private Table SelectedTable;
+    private List<Table> tables;
+    private Func<string, Task<IEnumerable<Table>>> SearchFunc;
 
     protected override async Task OnParametersSetAsync()
     {
         if (SelectedDatabase != _selectedDatabase)
         {
             SelectedTable = null;
-            tables = (await DatabaseService.GetTables(SelectedDatabase)).Select(db => db.Name).ToList();
+            tables = await DatabaseService.GetTables(SelectedDatabase);
             _selectedDatabase = SelectedDatabase;
         }
 
@@ -32,7 +33,7 @@
             if (string.IsNullOrEmpty(value))
                 return Task.FromResult(tables.AsEnumerable());
 
-            var res = tables.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+            var res = tables.Where(x => x.Name.Contains(value, StringComparison.InvariantCultureIgnoreCase));
 
             return Task.FromResult(res.AsEnumerable());
         };

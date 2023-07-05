@@ -1,6 +1,7 @@
-﻿@using MudBlazor;
+﻿@using data_sense_blazor.Models;
+@using MudBlazor;
 @using data_sense_blazor.Interfaces;
-@using data_sense_blazor.Models;
+@inject AppState AppState
 @inject SQLServerDatabaseService DatabaseService;
 
 @if (columns != null)
@@ -17,7 +18,7 @@
                         <MudButton OnClick="() => OnPreviewButtonClicked()"  Variant="Variant.Outlined" Color="Color.Primary" Class="w-full">Preview</MudButton>
                     </div>
                     <div class="col-span-1">
-                        <MudCheckBox @bind-Checked="@column.IsChecked" Color="Color.Primary" Class="items-center"></MudCheckBox>
+                        <MudCheckBox Checked="@column.IsChecked" CheckedChanged="(bool isChecked) => OnCheckboxClicked(column, isChecked)" Color="Color.Primary" Class="items-center"></MudCheckBox>
                     </div>
                 </div>
             </MudField>
@@ -28,23 +29,40 @@
 @code {
     private string _selectedTable;
     [Parameter]
-    public string SelectedTable { get; set; }
+    public Table SelectedTable { get; set; }
     [Parameter]
     public string SelectedDatabase { get; set; }
+    public List<string> ColumnsSelected { get; set; }
 
     private List<Column> columns;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (SelectedTable != _selectedTable)
+        if (SelectedTable.Name != _selectedTable)
         {
-            columns = await DatabaseService.GetColumns(SelectedDatabase, SelectedTable);
-            _selectedTable = SelectedTable;
+            columns = await DatabaseService.GetColumns(SelectedDatabase, SelectedTable.Name);
+            _selectedTable = SelectedTable.Name;
+            ColumnsSelected = new List<string>();
         }
     }
 
     private async Task OnPreviewButtonClicked()
     {
-        var res = await DatabaseService.ExecuteGroupBy("Name", SelectedTable, SelectedDatabase);
+        var queryResult = await DatabaseService.ExecuteGroupBy(ColumnsSelected, SelectedTable, SelectedDatabase);
+        AppState.SetQueryResult(queryResult);
+        AppState.OnQueryResultChange += StateHasChanged;
+    }
+
+    private void OnCheckboxClicked(Column column, bool isChecked)
+    {
+        column.IsChecked = isChecked;
+        if (isChecked)
+        {
+            ColumnsSelected.Add(column.Name);
+        }
+        else
+        {
+            ColumnsSelected.Remove(column.Name);
+        }
     }
 }

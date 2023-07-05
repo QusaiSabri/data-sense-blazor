@@ -9,6 +9,6 @@ namespace data_sense_blazor.Interfaces
         Task<List<Table>> GetTables(string databaseName);
         Task<List<Column>> GetColumns(string databaseName, string tableName);
         Task<DataTable> ExecuteQuery(string query);
-        Task<DataTable> ExecuteGroupBy(string column, string table, string database);
+        Task<DataTable> ExecuteGroupBy(List<string> column, Table table, string database);
     }
 }
