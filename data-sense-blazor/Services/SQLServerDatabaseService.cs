@@ -161,16 +161,21 @@ public class SQLServerDatabaseService : IDatabaseService
         DataTable dataTable = new DataTable();
         try
         {
-            var columnNames = string.Join(", ", columns.Select(c => $"[{c}]"));
+            //var columnNames = string.Join(", ", columns.Select(c => $"[{c}]"));
 
-            string commandText = $"SELECT COUNT(*), {columnNames} FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY {columnNames}";
+            //string commandText = $"SELECT COUNT(*) AS Count, {columnNames} FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY {columnNames}";
+
+            string commandText = $"SELECT COUNT(*) AS Count, " +
+                     string.Join(", ", columns.Select(c => $"ISNULL([{c}], 'NULL') AS [{c}]")) +
+                     $" FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY " +
+                     string.Join(", ", columns.Select(c => $"[{c}]"));
+
 
             using (SqlCommand command = new SqlCommand(commandText, conn))
             {
-                using (SqlDataReader reader = await command.ExecuteReaderAsync())
-                {
-                    dataTable.Load(reader);
-                }
+                SqlDataAdapter da = new SqlDataAdapter(command);
+                da.FillSchema(dataTable, SchemaType.Source);
+                da.Fill(dataTable);
             }
         }
         catch (Exception ex)
