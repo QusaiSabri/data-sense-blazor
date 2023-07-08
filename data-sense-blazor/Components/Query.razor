@@ -1,0 +1,29 @@
+﻿@using MudBlazor
+@inject AppState AppState
+
+<MudTextField Margin="Margin.Normal" @bind-Value="@QueryText" Variant="Variant.Text"></MudTextField>
+
+@code {
+    private string QueryText { get; set; } = "";
+
+    protected override void OnInitialized()
+    {
+        AppState.OnQueryChange += UpdateData;
+        UpdateData();
+    }
+
+    private void UpdateData()
+    {
+        if (AppState.Query.Length > 0)
+        {
+            QueryText = AppState.Query;
+        }
+
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        AppState.OnQueryChange -= UpdateData;
+    }
+}

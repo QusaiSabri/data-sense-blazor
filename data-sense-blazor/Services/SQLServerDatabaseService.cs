@@ -166,10 +166,9 @@ public class SQLServerDatabaseService : IDatabaseService
             //string commandText = $"SELECT COUNT(*) AS Count, {columnNames} FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY {columnNames}";
 
             string commandText = $"SELECT " +
-                     string.Join(", ", columns.Select(c => $"ISNULL([{c}], 'NULL') AS [{c}]")) + " , COUNT(*) AS Count" +
-                     $" FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY " +
-                     string.Join(", ", columns.Select(c => $"[{c}]"));
-
+                 string.Join(", ", columns.Select(c => $"ISNULL([{c}], 'NULL') AS [{c}]")) + " , COUNT(*) AS Count" +
+                 $" FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY " +
+                 string.Join(", ", columns.Select(c => $"[{c}]"));
 
             using (SqlCommand command = new SqlCommand(commandText, conn))
             {
@@ -191,5 +190,15 @@ public class SQLServerDatabaseService : IDatabaseService
         }
 
         return dataTable;
+    }
+
+    public Task<string> GenerateQuery(List<string> columns, Table table, string database)
+    {
+        string commandText = $"SELECT " +
+                    string.Join(", ", columns.Select(c => $"ISNULL([{c}], 'NULL') AS [{c}]")) + " , COUNT(*) AS Count" +
+                    $" FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY " +
+                    string.Join(", ", columns.Select(c => $"[{c}]"));
+
+        return Task.FromResult(commandText);
     }
 }

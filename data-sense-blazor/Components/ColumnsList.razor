@@ -15,7 +15,7 @@
                         <p class="overflow-hidden overflow-ellipsis">@column.Name</p>
                     </div>
                     <div class="col-span-2">
-                        <MudButton OnClick="() => OnPreviewButtonClicked()"  Variant="Variant.Outlined" Color="Color.Primary" Class="w-full">Preview</MudButton>
+                        <MudButton OnClick="() => OnPreviewButtonClicked(column.Name)"  Variant="Variant.Outlined" Color="Color.Primary" Class="w-full">Preview</MudButton>
                     </div>
                     <div class="col-span-1">
                         <MudCheckBox Checked="@column.IsChecked" CheckedChanged="(bool isChecked) => OnCheckboxClicked(column, isChecked)" Color="Color.Primary" Class="items-center"></MudCheckBox>
@@ -46,9 +46,16 @@
         }
     }
 
-    private async Task OnPreviewButtonClicked()
+    private async Task OnPreviewButtonClicked(string column)
     {
-        var queryResult = await DatabaseService.ExecuteGroupBy(ColumnsSelected, SelectedTable, SelectedDatabase);
+        var columns = new List<string>();
+        columns.Add(column);
+
+        var query = await DatabaseService.GenerateQuery(columns, SelectedTable, SelectedDatabase);
+        AppState.SetQuery(query);
+        AppState.OnQueryChange += StateHasChanged;
+        
+        var queryResult = await DatabaseService.ExecuteQuery(query);        
         AppState.SetQueryResult(queryResult);
         AppState.OnQueryResultChange += StateHasChanged;
     }
