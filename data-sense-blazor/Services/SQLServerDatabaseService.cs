@@ -165,8 +165,8 @@ public class SQLServerDatabaseService : IDatabaseService
 
             //string commandText = $"SELECT COUNT(*) AS Count, {columnNames} FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY {columnNames}";
 
-            string commandText = $"SELECT COUNT(*) AS Count, " +
-                     string.Join(", ", columns.Select(c => $"ISNULL([{c}], 'NULL') AS [{c}]")) +
+            string commandText = $"SELECT " +
+                     string.Join(", ", columns.Select(c => $"ISNULL([{c}], 'NULL') AS [{c}]")) + " , COUNT(*) AS Count" +
                      $" FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY " +
                      string.Join(", ", columns.Select(c => $"[{c}]"));
 

@@ -66,9 +66,7 @@
     {
         if (firstRender)
         {
-            await JS.InvokeVoidAsync("setupSplit", new[] { new[] { "dataSenseLeftPane", "dataSenseRightPane" },
-                                                   new[] { "dataSenseTopRightPane", "dataSenseBottomRightPane" }
-        })
+            await JS.InvokeVoidAsync("setupSplit", new[] { "dataSenseLeftPane", "dataSenseRightPane" }, new[] { "dataSenseTopRightPane", "dataSenseBottomRightPane" })
              .AsTask()
              .ContinueWith(task =>
              {
@@ -78,7 +76,8 @@
                  }
              });
 
+            await JS.InvokeVoidAsync("updateMudTableHeight");
         }
     }
-
 }
+
