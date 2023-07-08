@@ -1,8 +1,8 @@
-﻿using data_sense_blazor.Interfaces;
+﻿using System.Data;
+using data_sense_blazor.Interfaces;
 using data_sense_blazor.Models;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
-using System.Data;
 
 public class SQLServerDatabaseService : IDatabaseService
 {
@@ -58,7 +58,7 @@ public class SQLServerDatabaseService : IDatabaseService
         {
             await connection.OpenAsync();
 
-            using (var command = new SqlCommand($"USE {databaseName}; SELECT name FROM sys.tables;", connection))
+            using (var command = new SqlCommand($"USE {databaseName}; SELECT TABLE_SCHEMA, TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE';", connection))
             {
                 using (var reader = await command.ExecuteReaderAsync())
                 {
@@ -66,7 +66,8 @@ public class SQLServerDatabaseService : IDatabaseService
                     {
                         var table = new Table
                         {
-                            Name = reader.GetString(0)
+                            SchemaName = reader.GetString(0),
+                            Name = reader.GetString(1)
                         };
 
                         tables.Add(table);
@@ -79,6 +80,7 @@ public class SQLServerDatabaseService : IDatabaseService
         _logger.LogInformation("Finished getting tables for database: {databaseName}.", databaseName);
         return tables;
     }
+
 
     public async Task<List<Column>> GetColumns(string databaseName, string tableName)
     {
@@ -117,5 +119,77 @@ public class SQLServerDatabaseService : IDatabaseService
 
         _logger.LogInformation("Finished getting columns for table: {tableName} in database: {databaseName}", tableName, databaseName);
         return columns;
+    }
+
+    public async Task<DataTable> ExecuteQuery(string query)
+    {
+        var conn = new SqlConnection(_connectionString);
+        DataTable dataTable = new DataTable();
+
+        using (SqlCommand command = new SqlCommand(query, conn))
+        {
+            try
+            {
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                {
+                    dataTable.Load(reader);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        return dataTable;
+    }
+
+    public async Task<DataTable> ExecuteGroupBy(List<string> columns, Table table, string database)
+    {
+        var conn = new SqlConnection(_connectionString);
+
+        if (conn.State != ConnectionState.Open)
+        {
+            await conn.OpenAsync();
+        }
+
+        DataTable dataTable = new DataTable();
+        try
+        {
+            //var columnNames = string.Join(", ", columns.Select(c => $"[{c}]"));
+
+            //string commandText = $"SELECT COUNT(*) AS Count, {columnNames} FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY {columnNames}";
+
+            string commandText = $"SELECT COUNT(*) AS Count, " +
+                     string.Join(", ", columns.Select(c => $"ISNULL([{c}], 'NULL') AS [{c}]")) +
+                     $" FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY " +
+                     string.Join(", ", columns.Select(c => $"[{c}]"));
+
+
+            using (SqlCommand command = new SqlCommand(commandText, conn))
+            {
+                SqlDataAdapter da = new SqlDataAdapter(command);
+                da.FillSchema(dataTable, SchemaType.Source);
+                da.Fill(dataTable);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            if (conn.State == ConnectionState.Open)
+            {
+                conn.Close();
+            }
+        }
+
+        return dataTable;
     }
 }

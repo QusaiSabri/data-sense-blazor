@@ -1,4 +1,5 @@
 ﻿using data_sense_blazor.Data;
+using data_sense_blazor.Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
@@ -29,11 +30,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
         builder.Services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
-        // Provide ILogger when creating SQLServerDatabaseService singleton
         builder.Services.AddSingleton(s => new SQLServerDatabaseService(connectionString, s.GetRequiredService<ILogger<SQLServerDatabaseService>>()));
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddMudServices();
         //builder.Services.AddScoped<SQLServerDatabaseService>();
+        builder.Services.AddSingleton<AppState>();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

@@ -1,6 +1,7 @@
 ﻿@page "/"
 @using MudBlazor
 @using data_sense_blazor.Components
+@inject AppState AppState
 @inject IJSRuntime JS
 
 
@@ -42,8 +43,9 @@
                     </MudPaper>
                 </MudContainer>
             </div>
-            <div id="dataSenseBottomRightPane">
+            <div id="dataSenseBottomRightPane" class="overflow-x-auto">
                 <MudContainer Fixed="true">
+                    <ResultsTable />
                 </MudContainer>
             </div>
         </MudItem>
