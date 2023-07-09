@@ -1,8 +1,10 @@
 ﻿@page "/"
 @using MudBlazor
 @using data_sense_blazor.Components
+@using data_sense_blazor.Interfaces;
 @inject AppState AppState
 @inject IJSRuntime JS
+@inject SQLServerDatabaseService DatabaseService;
 
 
 <MudGrid Spacing="2" Justify="Justify.FlexStart" Class="h-screen split flex-nowrap">
@@ -28,8 +30,9 @@
             <div id="dataSenseTopRightPane">
                 <MudContainer Fixed="true" Class="pb-4">
                     <MudPaper Elevation="25">
-                        <MudToolBar Class="bg-blue-100">
-                            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" Class="mr-5" />
+                        <MudToolBar>
+                            <MudButton OnClick="OnPreviewGroupButtonClicked" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">Preview Selected</MudButton>
+                            <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" />
                             <MudIconButton Icon="@Icons.Material.Outlined.Add" />
                             <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
                             <MudIconButton Icon="@Icons.Material.Outlined.Remove" Color="Color.Inherit" />
@@ -81,6 +84,21 @@
 
             await JS.InvokeVoidAsync("updateMudTableHeight");
         }
+    }
+
+    private async void OnPreviewGroupButtonClicked()
+    {
+        var columns = AppState.ColumnsSelected;
+        var SelectedTable = AppState.SelectedTable;
+        var SelectedDatabase = AppState.SelectedDatabase;
+
+        var query = await DatabaseService.GenerateQuery(columns, SelectedTable, SelectedDatabase);
+        AppState.SetQuery(query);
+        AppState.OnQueryChange += StateHasChanged;
+
+        var queryResult = await DatabaseService.ExecuteQuery(query);
+        AppState.SetQueryResult(queryResult);
+        AppState.OnQueryResultChange += StateHasChanged;
     }
 }
 

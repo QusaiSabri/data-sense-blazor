@@ -2,9 +2,10 @@
 @using MudBlazor;
 @using data_sense_blazor.Models;
 @using data_sense_blazor.Services;
+@inject AppState AppState;
 @inject SQLServerDatabaseService DatabaseService;
 
-<MudAutocomplete T="Table" Label="Tables" @bind-Value="SelectedTable" ToStringFunc="@((Table t) => t?.Name ?? "")" SearchFunc="@SearchFunc" Variant="Variant.Outlined" Class="mt-3" Clearable=true Strict=false />
+<MudAutocomplete ValueChanged="OnTableSelected" T="Table" Label="Tables" Value="@SelectedTable" ToStringFunc="@((Table t) => t?.Name ?? "")" SearchFunc="@SearchFunc" Variant="Variant.Outlined" Class="mt-3" Clearable=true Strict=false />
 
 @if (SelectedTable != null)
 {
@@ -37,5 +38,11 @@
 
             return Task.FromResult(res.AsEnumerable());
         };
+    }
+
+    private void OnTableSelected(Table value)
+    {
+        SelectedTable = value;
+        AppState.SetSelectedTable(value);
     }
 }

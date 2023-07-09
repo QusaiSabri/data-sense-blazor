@@ -2,9 +2,10 @@
 @using MudBlazor
 @using data_sense_blazor.Models;
 @using data_sense_blazor.Services;
+@inject AppState AppState
 @inject SQLServerDatabaseService DatabaseService
 
-<MudAutocomplete T="string" Label="Databasess" @bind-Value="SelectedDatabase" SearchFunc="@Search" Variant="Variant.Outlined" Clearable=true Strict=false />
+<MudAutocomplete ValueChanged="OnDatabaseSelected" T="string" Label="Databasess" Value="@SelectedDatabase" SearchFunc="@Search" Variant="Variant.Outlined" Clearable=true Strict=false />
 
 @if (!string.IsNullOrEmpty(SelectedDatabase))
 {
@@ -29,5 +30,11 @@
 
         var res = databases.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         return Task.FromResult(res.AsEnumerable());
+    }
+
+    private void OnDatabaseSelected(string value)
+    {
+        SelectedDatabase = value;
+        AppState.SetSelectedDatabase(value);
     }
 }

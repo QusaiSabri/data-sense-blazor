@@ -71,5 +71,8 @@
         {
             ColumnsSelected.Remove(column.Name);
         }
+
+        AppState.SetColumnsSelected(ColumnsSelected);
+        AppState.OnColumnsSelectedChange += StateHasChanged;
     }
 }
