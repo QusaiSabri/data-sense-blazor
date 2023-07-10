@@ -161,14 +161,14 @@ public class SQLServerDatabaseService : IDatabaseService
         DataTable dataTable = new DataTable();
         try
         {
-            //var columnNames = string.Join(", ", columns.Select(c => $"[{c}]"));
+            var columnNames = string.Join(", ", columns.Select(c => $"[{c}]"));
 
-            //string commandText = $"SELECT COUNT(*) AS Count, {columnNames} FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY {columnNames}";
+            string commandText = $"SELECT COUNT(*) AS Count, {columnNames} FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY {columnNames}";
 
-            string commandText = $"SELECT " +
-                 string.Join(", ", columns.Select(c => $"ISNULL([{c}], 'NULL') AS [{c}]")) + " , COUNT(*) AS Count" +
-                 $" FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY " +
-                 string.Join(", ", columns.Select(c => $"[{c}]"));
+            //string commandText = $"SELECT " +
+            //     string.Join(", ", columns.Select(c => $"ISNULL([{c}], 'NULL') AS [{c}]")) + " , COUNT(*) AS Count" +
+            //     $" FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY " +
+            //     string.Join(", ", columns.Select(c => $"[{c}]"));
 
             using (SqlCommand command = new SqlCommand(commandText, conn))
             {
@@ -194,10 +194,9 @@ public class SQLServerDatabaseService : IDatabaseService
 
     public Task<string> GenerateQuery(List<string> columns, Table table, string database)
     {
-        string commandText = $"SELECT " +
-                    string.Join(", ", columns.Select(c => $"ISNULL([{c}], 'NULL') AS [{c}]")) + " , COUNT(*) AS Count" +
-                    $" FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY " +
-                    string.Join(", ", columns.Select(c => $"[{c}]"));
+        var columnNames = string.Join(", ", columns.Select(c => $"[{c}]"));
+
+        string commandText = $"SELECT {columnNames}, COUNT(*) AS Count FROM [{database}].[{table.SchemaName}].[{table.Name}] GROUP BY {columnNames} ORDER BY Count DESC";
 
         return Task.FromResult(commandText);
     }

@@ -15,7 +15,9 @@
         <RowTemplate Context="row">
             @foreach (var cell in row)
             {
-                <MudTd DataLabel="@cell.Key">@cell.Value</MudTd>
+                string value = cell.Value == null ? "NULL" : cell.Value.ToString();
+
+                <MudTd DataLabel="@cell.Key">@value</MudTd>
             }
         </RowTemplate>
     </MudTable>

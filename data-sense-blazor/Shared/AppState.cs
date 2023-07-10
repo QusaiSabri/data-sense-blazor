@@ -13,9 +13,22 @@ namespace data_sense_blazor.Shared
 
         public event Action OnQueryResultChange;
         public event Action OnQueryChange;
-        public event Action OnColumnsSelectedChange;
+        public event Action OnColumnsSelectedChanged;
         public event Action OnSelectedTableChange;
         public event Action OnSelectedDatabaseChange;
+
+        public void AddToColumnsSelected(string column)
+        {
+            ColumnsSelected.Add(column);
+            OnColumnsSelectedChanged?.Invoke();
+        }
+
+        public void RemoveFromColumnsSelected(string column)
+        {
+            ColumnsSelected.Remove(column);
+            OnColumnsSelectedChanged?.Invoke();
+        }
+
 
         public void SetQueryResult(DataTable queryResult)
         {
@@ -32,7 +45,7 @@ namespace data_sense_blazor.Shared
         public void SetColumnsSelected(List<string> columnsSelected)
         {
             ColumnsSelected = columnsSelected;
-            OnColumnsSelectedChange?.Invoke();
+            OnColumnsSelectedChanged?.Invoke();
         }
 
         public void SetSelectedTable(Table selectedTable)

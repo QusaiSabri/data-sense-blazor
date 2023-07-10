@@ -27,11 +27,11 @@
     </div>
     <div id="dataSenseRightPane">
         <MudItem xs="12" Class="overflow-auto" style="height: calc(100vh - 100px);">
-            <div id="dataSenseTopRightPane">
+            <div id="dataSenseTopRightPane" class="overflow-auto">
                 <MudContainer Fixed="true" Class="pb-4">
                     <MudPaper Elevation="25">
                         <MudToolBar>
-                            <MudButton OnClick="OnPreviewGroupButtonClicked" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">Preview Selected</MudButton>
+                            <MudButton Disabled="AppState.ColumnsSelected.Count <= 1" OnClick="OnPreviewGroupButtonClicked" Variant="Variant.Outlined" Size="Size.Small" Color="Color.Primary">Preview Selected</MudButton>
                             <MudIconButton Icon="@Icons.Material.Outlined.Menu" Color="Color.Inherit" />
                             <MudIconButton Icon="@Icons.Material.Outlined.Add" />
                             <MudIconButton Icon="@Icons.Material.Outlined.Edit" />
@@ -67,6 +67,17 @@
     {
         open = !open;
     }
+
+    protected override void OnInitialized()
+    {
+        AppState.OnColumnsSelectedChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnColumnsSelectedChanged -= StateHasChanged;
+    }
+
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

@@ -1,10 +1,14 @@
 ﻿@using MudBlazor
+@using data_sense_blazor.Helpers;
 @inject AppState AppState
 
-<MudTextField Margin="Margin.Normal" @bind-Value="@QueryText" Variant="Variant.Text"></MudTextField>
+@*<MudTextField Margin="Margin.Normal" @bind-Value="@QueryText" Variant="Variant.Text"></MudTextField>*@
+<code style="white-space: pre-line; font-family: monospace;">@FormattedQuery</code>
+
 
 @code {
     private string QueryText { get; set; } = "";
+    private string FormattedQuery { get; set; }
 
     protected override void OnInitialized()
     {
@@ -17,6 +21,7 @@
         if (AppState.Query.Length > 0)
         {
             QueryText = AppState.Query;
+            FormattedQuery = DataTableHelper.FormatSQL(QueryText);
         }
 
         StateHasChanged();

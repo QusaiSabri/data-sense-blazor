@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Text.RegularExpressions;
 
 namespace data_sense_blazor.Helpers
 {
@@ -14,7 +15,14 @@ namespace data_sense_blazor.Helpers
 
                 foreach (DataColumn column in dt.Columns)
                 {
-                    rowDictionary[column.ColumnName] = row[column];
+                    if (row[column] == DBNull.Value)
+                    {
+                        rowDictionary[column.ColumnName] = null;
+                    }
+                    else
+                    {
+                        rowDictionary[column.ColumnName] = row[column];
+                    }
                 }
 
                 convertedList.Add(rowDictionary);
@@ -22,5 +30,18 @@ namespace data_sense_blazor.Helpers
 
             return convertedList;
         }
+        public static string FormatSQL(string query)
+        {
+            query = Regex.Replace(query, @"\s+", " ");
+
+            string[] keywords = new[] { "SELECT", "FROM", "WHERE", "GROUP BY", "HAVING", "ORDER BY", "INNER JOIN", "LEFT JOIN", "RIGHT JOIN" };
+            foreach (var keyword in keywords)
+            {
+                query = query.Replace(keyword, "\n" + keyword);
+            }
+
+            return query;
+        }
+
     }
 }
