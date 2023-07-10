@@ -5,8 +5,10 @@
 @inject AppState AppState;
 @inject SQLServerDatabaseService DatabaseService;
 
+<div class="flex">
 <MudAutocomplete ValueChanged="OnTableSelected" T="Table" Label="Tables" Value="@SelectedTable" ToStringFunc="@((Table t) => t?.Name ?? "")" SearchFunc="@SearchFunc" Variant="Variant.Outlined" Class="mt-3" Clearable=true Strict=false />
-
+<MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
+</div>
 @if (SelectedTable != null)
 {
     <ColumnsList SelectedDatabase="@SelectedDatabase" SelectedTable="@SelectedTable" />

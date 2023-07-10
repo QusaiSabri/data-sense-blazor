@@ -9,7 +9,12 @@
 
 @if (!string.IsNullOrEmpty(SelectedDatabase))
 {
-    <TablesDropDown SelectedDatabase="@SelectedDatabase" />
+    <MudTabs Rounded="true" Centered="true" Color="@Color.Primary" Outlined="true" Border="true">
+        <MudTabPanel Text="Tables" >
+            <TablesDropDown SelectedDatabase="@SelectedDatabase" />
+        </MudTabPanel>
+        <MudTabPanel Text="Views"></MudTabPanel>
+    </MudTabs>
 
 }
 
