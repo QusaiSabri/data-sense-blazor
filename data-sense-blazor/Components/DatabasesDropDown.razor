@@ -9,11 +9,15 @@
 
 @if (!string.IsNullOrEmpty(SelectedDatabase))
 {
-    <MudTabs Rounded="true" Centered="true" Color="@Color.Primary" Outlined="true" Border="true">
+    <MudTabs KeepPanelsAlive="true" MinimumTabWidth="20px" Rounded="true" Centered="true" Outlined="true" Border="true">
         <MudTabPanel Text="Tables" >
-            <TablesDropDown SelectedDatabase="@SelectedDatabase" />
+            <ChildContent>
+                <TablesDropDown SelectedDatabase="@SelectedDatabase" />
+            </ChildContent>
         </MudTabPanel>
+        <MudTabPanel Text="Stored Procedures"></MudTabPanel>
         <MudTabPanel Text="Views"></MudTabPanel>
+        <MudTabPanel Text="Functions"></MudTabPanel>
     </MudTabs>
 
 }
