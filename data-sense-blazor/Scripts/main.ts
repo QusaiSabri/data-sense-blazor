@@ -7,7 +7,7 @@ export function setupSplit(horizontalPaneSelectors: string[], verticalPaneSelect
     Split(horizontalSelectors, {
         gutterSize: 8,
         cursor: 'col-resize',
-        sizes: [25, 75],
+        sizes: [30, 70],
         minSize: [200, 400],
         onDragEnd: () => updateMudTableHeight()
     });
@@ -26,8 +26,12 @@ export function updateMudTableHeight(): void {
     if (tableContainer) {
         const paneRect = pane?.getBoundingClientRect();
         const tableContainerRect = tableContainer.getBoundingClientRect();
-        const newHeight = paneRect.height - (tableContainerRect.top - paneRect.top);
-        tableContainer.style.height = `${newHeight - 2}px`;
+
+        if (paneRect != null) {
+            const newHeight = paneRect.height - (tableContainerRect.top - paneRect.top);
+            tableContainer.style.height = `${newHeight - 2}px`;
+        }
+
     }
 }
 

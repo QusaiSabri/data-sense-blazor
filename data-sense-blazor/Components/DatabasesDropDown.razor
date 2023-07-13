@@ -9,7 +9,28 @@
 
 @if (!string.IsNullOrEmpty(SelectedDatabase))
 {
-    <TablesDropDown SelectedDatabase="@SelectedDatabase" />
+    <MudTabs KeepPanelsAlive="true" MinimumTabWidth="20px" Rounded="true" Centered="true" Outlined="true" Border="true">
+        <MudTabPanel Text="Tables" >
+            <ChildContent>
+                <TablesDropDown SelectedDatabase="@SelectedDatabase" />
+            </ChildContent>
+        </MudTabPanel>
+        <MudTabPanel Text="Stored Procedures">
+            <ChildContent>
+                <div class="p-12 !h-32 text-center">Comming soon</div>
+            </ChildContent>
+        </MudTabPanel>
+        <MudTabPanel Text="Views">
+            <ChildContent>
+                <div class="p-12 !h-32 text-center">Comming soon</div>
+            </ChildContent>
+        </MudTabPanel>
+        <MudTabPanel Text="Functions">
+            <ChildContent>
+                <div class="p-12 !h-32 text-center">Comming soon</div>
+            </ChildContent>
+        </MudTabPanel>
+    </MudTabs>
 
 }
 

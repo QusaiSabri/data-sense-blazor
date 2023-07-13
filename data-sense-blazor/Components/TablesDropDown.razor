@@ -1,12 +1,15 @@
 ﻿@using Microsoft.Extensions.Configuration;
 @using MudBlazor;
+@using data_sense_blazor.Components.Menus
 @using data_sense_blazor.Models;
 @using data_sense_blazor.Services;
 @inject AppState AppState;
 @inject SQLServerDatabaseService DatabaseService;
 
+<div class="flex">
 <MudAutocomplete ValueChanged="OnTableSelected" T="Table" Label="Tables" Value="@SelectedTable" ToStringFunc="@((Table t) => t?.Name ?? "")" SearchFunc="@SearchFunc" Variant="Variant.Outlined" Class="mt-3" Clearable=true Strict=false />
-
+<TableMenu />
+</div>
 @if (SelectedTable != null)
 {
     <ColumnsList SelectedDatabase="@SelectedDatabase" SelectedTable="@SelectedTable" />

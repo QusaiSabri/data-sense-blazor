@@ -7,22 +7,27 @@
 @if (columns != null)
 {
     <div class="mt-3 w-full">
-        @foreach (var column in columns)
-        {
-            <MudField Variant="Variant.Outlined" InnerPadding="false" Class="mt-0">
-                <div class="grid grid-cols-8 gap-2 items-center divide-x py-2 px-1">
-                    <div class="col-span-4">
-                        <p class="overflow-hidden overflow-ellipsis">@column.Name</p>
-                    </div>
-                    <div class="col-span-3">
-                        <MudButton OnClick="() => OnPreviewButtonClicked(column.Name)"  Variant="Variant.Outlined" Color="Color.Primary" Class="w-full">Preview</MudButton>
-                    </div>
-                    <div class="col-span-1">
-                        <MudCheckBox Checked="@column.IsChecked" CheckedChanged="(bool isChecked) => OnCheckboxClicked(column, isChecked)" Color="Color.Primary" Class="items-center"></MudCheckBox>
-                    </div>
-                </div>
-            </MudField>
-        }
+        <MudSimpleTable Bordered="true" Style="overflow-x: auto;">
+                <thead>
+                    <tr>
+                        @foreach (var h in headings)
+                        {
+                            <th>@h</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var column in columns)
+                {
+                        <tr>
+                            <td>@column.Name</td>
+                            @*<td><MudTextField @bind-Value="AliasColumnText"></MudTextField></td>*@
+                            <td><MudButton OnClick="() => OnPreviewButtonClicked(column.Name)" Variant="Variant.Outlined" Color="Color.Primary" Class="w-full col-span-3">Preview</MudButton></td>
+                            <td><MudCheckBox Checked="@column.IsChecked" CheckedChanged="(bool isChecked) => OnCheckboxClicked(column, isChecked)" Color="Color.Primary" Class="items-center col-span-1"></MudCheckBox></td>                            
+                        </tr>
+                    }
+                </tbody>
+            </MudSimpleTable>
     </div>
 }
 
@@ -34,6 +39,8 @@
     public string SelectedDatabase { get; set; }
     public List<string> ColumnsSelected { get; set; }
     private List<Column> columns;
+    private List<string> headings = new List<string>() { "Column", "Preview", "Select" };
+    private string AliasColumnText { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
