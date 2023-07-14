@@ -1,0 +1,31 @@
+﻿@inject IDialogService DialogService
+
+<MudDialog>
+    <DialogContent>
+		<MudPaper Width="500px">
+			<MudList Clickable="true" Class="flex">				
+				<MudListItem>
+					<MudImage Src="/images/sql-server.svg" Alt="SQL Server" Elevation="25" Width="90" ObjectFit="ObjectFit.Cover" Class="rounded-lg p-2.5" />
+				</MudListItem>
+				<MudListItem>
+					<MudImage Src="/images/mongodb.svg" Alt="SQL Server" Elevation="25" Width="90" ObjectFit="ObjectFit.Cover" Class="rounded-lg p-2.5" />
+				</MudListItem>				
+			</MudList>
+		</MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="OpenSecondDialog">Open Second Dialog</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    void Cancel() => MudDialog.Cancel();
+
+    private void OpenSecondDialog()
+    {
+        DialogService.Show<ServerConnectionDetails>("Second Level Dialog");
+    }
+}
