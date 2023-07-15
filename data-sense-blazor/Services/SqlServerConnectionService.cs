@@ -16,9 +16,9 @@ namespace data_sense_blazor.Services
         {
             try
             {
-				string connectionString = BuildConnectionString(config);
+                string connectionString = BuildConnectionString(config);
 
-				using (SqlConnection connection = new SqlConnection(connectionString))
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     await connection.OpenAsync();
 
@@ -35,21 +35,20 @@ namespace data_sense_blazor.Services
             }
         }
 
-		private string BuildConnectionString(DatabaseConfiguration config)
-		{
-			SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder
-			{
-				DataSource = config.ServerName,
-				InitialCatalog = string.IsNullOrWhiteSpace(config.DatabaseName) ? "master" : config.DatabaseName,
-				IntegratedSecurity = config.Password.Any() ? false : true,
-				TrustServerCertificate = config.TrustServerCertificate,
-                UserID = config.UserId,
-                Password = config.Password,
-			};
+        private string BuildConnectionString(DatabaseConfiguration config)
+        {
+            SqlConnectionStringBuilder builder = new SqlConnectionStringBuilder
+            {
+                DataSource = config.ServerName,
+                InitialCatalog = string.IsNullOrWhiteSpace(config.DatabaseName) ? "master" : config.DatabaseName,
+                IntegratedSecurity = string.IsNullOrWhiteSpace(config.Password) ? true : false,
+                TrustServerCertificate = config.TrustServerCertificate,
+                UserID = config.UserId ?? "",
+                Password = config.Password ?? "",
+            };
 
-			return builder.ConnectionString;
-		}
+            return builder.ConnectionString;
+        }
 
-
-	}
+    }
 }
