@@ -1,10 +1,10 @@
 ﻿@using data_sense_blazor.Enums;
 @using data_sense_blazor.Interfaces;
 @using data_sense_blazor.Models;
-<MudDialog>
+<MudDialog Class="w-9/12">
     <DialogContent>
-        <MudPaper Width="auto" Elevation="0" Class="p-1">
-            <MudText>@DataSourceType</MudText>
+        <MudPaper  Elevation="0" Class="p-1">
+            @*<MudText>@DataSourceType</MudText>*@
             <MudTextField @bind-Value="databaseConfiguration.ServerName" Label="Server Name" Variant="Variant.Outlined" Class="pb-2"></MudTextField>
             <MudSelect @bind-Value="enumValue" Label="Authentication" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
                     @foreach (AuthenticationEnum item in Enum.GetValues(typeof(AuthenticationEnum)))
@@ -14,14 +14,15 @@
                 </MudSelect>
                 @if (enumValue == AuthenticationEnum.SQLServerAuthentication)
                 {
-                <MudTextField @bind-Value="databaseConfiguration.UserId" Label="Username" Variant="Variant.Outlined" Class="py-2"></MudTextField>
-                <MudTextField @bind-Value="databaseConfiguration.Password" Label="Password" Variant="Variant.Outlined" Class="py-2"></MudTextField>
+                <MudTextField @bind-Value="databaseConfiguration.UserId" Label="Username" Variant="Variant.Outlined" Class="py-2"></MudTextField>                
+                <MudTextField @bind-Value="databaseConfiguration.Password" Label="Password" Variant="Variant.Outlined" Class="py-2" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
                 }
+            <MudCheckBox @bind-Checked="@databaseConfiguration.TrustServerCertificate" Label="Trust Server Certificate" Color="Color.Primary" Class="py-2"></MudCheckBox>
         </MudPaper>
     </DialogContent>    
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="CancelAll">Close All</MudButton>
+        @*<MudButton Color="Color.Primary" OnClick="CancelAll">Close All</MudButton>*@
         <MudButton OnClick="Connect">Connect</MudButton>
     </DialogActions>
 </MudDialog>
@@ -36,6 +37,9 @@
     [Parameter]
     public DatabaseConfiguration databaseConfiguration { get; set; }
     public AuthenticationEnum enumValue { get; set; } = AuthenticationEnum.WindowsAuthentication;
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
@@ -63,5 +67,21 @@
     protected override void OnInitialized()
     {
         databaseConfiguration ??= new DatabaseConfiguration();
+    }
+
+    void ButtonTestclick()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
     }
 }
