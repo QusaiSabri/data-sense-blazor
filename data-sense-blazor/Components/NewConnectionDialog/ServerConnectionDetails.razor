@@ -1,15 +1,41 @@
-﻿<MudDialog>
+﻿@using data_sense_blazor.Enums;
+@using data_sense_blazor.Interfaces;
+@using data_sense_blazor.Models;
+<MudDialog>
     <DialogContent>
-        Dialog Content
-    </DialogContent>
+        <MudPaper Width="auto" Elevation="0" Class="p-1">
+            <MudText>@DataSourceType</MudText>
+            <MudTextField @bind-Value="databaseConfiguration.ServerName" Label="Server Name" Variant="Variant.Outlined" Class="pb-2"></MudTextField>
+            <MudSelect @bind-Value="enumValue" Label="Authentication" Variant="Variant.Outlined" AnchorOrigin="Origin.BottomCenter">
+                    @foreach (AuthenticationEnum item in Enum.GetValues(typeof(AuthenticationEnum)))
+                    {
+                        <MudSelectItem Value="@item">@item</MudSelectItem>
+                    }                    
+                </MudSelect>
+                @if (enumValue == AuthenticationEnum.SQLServerAuthentication)
+                {
+                <MudTextField @bind-Value="databaseConfiguration.UserId" Label="Username" Variant="Variant.Outlined" Class="py-2"></MudTextField>
+                <MudTextField @bind-Value="databaseConfiguration.Password" Label="Password" Variant="Variant.Outlined" Class="py-2"></MudTextField>
+                }
+        </MudPaper>
+    </DialogContent>    
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
         <MudButton Color="Color.Primary" OnClick="CancelAll">Close All</MudButton>
+        <MudButton OnClick="Connect">Connect</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    [Parameter]
+    public string DataSourceType { get; set; }
+    [Parameter]
+    public IDatabaseConnectionService ConnectionService { get; set; }
+    [Parameter]
+    public DatabaseConfiguration databaseConfiguration { get; set; }
+    public AuthenticationEnum enumValue { get; set; } = AuthenticationEnum.WindowsAuthentication;
 
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
@@ -17,5 +43,25 @@
     private void CancelAll()
     {
         MudDialog.CancelAll();
+    }
+
+    private async void Connect()
+    {
+        var (isConnected, message) = await ConnectionService.Connect(databaseConfiguration);
+        if (isConnected)
+        {
+            MudDialog.Close(DialogResult.Ok(true));
+            MudDialog.CancelAll();
+
+        } else
+        {
+            MudDialog.Close(DialogResult.Ok(false));
+        }
+        
+    }
+
+    protected override void OnInitialized()
+    {
+        databaseConfiguration ??= new DatabaseConfiguration();
     }
 }

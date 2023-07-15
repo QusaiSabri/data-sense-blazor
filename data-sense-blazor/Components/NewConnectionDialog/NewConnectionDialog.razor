@@ -1,13 +1,18 @@
-﻿@inject IDialogService DialogService
+﻿@using data_sense_blazor.Enums;
+@using data_sense_blazor.Factories;
+@using data_sense_blazor.Interfaces;
+@inject IDialogService DialogService
+@inject IServiceProvider services
+
 
 <MudDialog>
     <DialogContent>
-		<MudPaper Width="500px">
-			<MudList Clickable="true" Class="flex">				
-				<MudListItem>
+		<MudPaper Width="auto" Elevation="0">
+            <MudList Clickable="true" @bind-SelectedItem="SelectedItem" Class="flex w-fit px-1">
+                <MudListItem Value="DataSourceEnum.SQLServer">
 					<MudImage Src="/images/sql-server.svg" Alt="SQL Server" Elevation="25" Width="90" ObjectFit="ObjectFit.Cover" Class="rounded-lg p-2.5" />
 				</MudListItem>
-				<MudListItem>
+                <MudListItem Value="DataSourceEnum.MongoDB">
 					<MudImage Src="/images/mongodb.svg" Alt="SQL Server" Elevation="25" Width="90" ObjectFit="ObjectFit.Cover" Class="rounded-lg p-2.5" />
 				</MudListItem>				
 			</MudList>
@@ -15,17 +20,24 @@
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="OpenSecondDialog">Open Second Dialog</MudButton>
+        <MudButton Color="Color.Primary" OnClick="OpenSecondDialog">Next</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+    public MudListItem SelectedItem { get; set; }
 
     void Cancel() => MudDialog.Cancel();
 
     private void OpenSecondDialog()
     {
-        DialogService.Show<ServerConnectionDetails>("Second Level Dialog");
+        IDatabaseConnectionService connectionService = ConnectionServiceFactory.GetConnectionService(SelectedItem.Value.ToString(), services);
+
+        var parameters = new DialogParameters<ServerConnectionDetails>();
+        parameters.Add(x => x.DataSourceType, SelectedItem.Value.ToString());
+        parameters.Add(x => x.ConnectionService, connectionService);
+        DialogService.Show<ServerConnectionDetails>("Connect to Server", parameters);
     }
 }

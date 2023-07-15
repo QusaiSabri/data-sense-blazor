@@ -38,12 +38,18 @@
     private string SelectedDatabase;
     private List<string> databases;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        var databases = await DatabaseService.GetDatabases();
-        this.databases = databases.Select(db => db.Name).ToList();
+        AppState.OnConnectionStatusChange += OnConnectionStatusChanged;
     }
 
+    private void OnConnectionStatusChanged()
+    {
+        if (AppState.IsConnected)
+        {
+            LoadDatabases();
+        }
+    }
     private Task<IEnumerable<string>> Search(string value)
     {
         if (string.IsNullOrEmpty(value))
@@ -53,9 +59,21 @@
         return Task.FromResult(res.AsEnumerable());
     }
 
+    private async void LoadDatabases()
+    {
+        var databases = await DatabaseService.GetDatabases();
+        this.databases = databases.Select(db => db.Name).ToList();
+        this.StateHasChanged();
+    }
+
     private void OnDatabaseSelected(string value)
     {
         SelectedDatabase = value;
         AppState.SetSelectedDatabase(value);
+    }
+
+    public void Dispose()
+    {
+        AppState.OnConnectionStatusChange -= OnConnectionStatusChanged;
     }
 }

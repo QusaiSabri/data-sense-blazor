@@ -22,7 +22,9 @@
                 </MudPaper>
                 <MudSpacer />
                 <MudPaper Elevation="25">
-                    <DatabasesDropDown />
+                    <div class="@(AppState.IsConnected ? "" : "hidden")">
+                        <DatabasesDropDown />
+                    </div>
                 </MudPaper>
             </MudStack>
         </MudItem>
@@ -73,11 +75,13 @@
     protected override void OnInitialized()
     {
         AppState.OnColumnsSelectedChanged += StateHasChanged;
+        AppState.OnConnectionStatusChange += StateHasChanged;
     }
 
     public void Dispose()
     {
         AppState.OnColumnsSelectedChanged -= StateHasChanged;
+        AppState.OnConnectionStatusChange -= StateHasChanged;
     }
 
 
@@ -117,7 +121,7 @@
     private void OpenNewConnectionDialog()
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
-        var dialog = DialogService.Show<NewConnectionDialog>("First Level Dialog", options);
+        var dialog = DialogService.Show<NewConnectionDialog>("Data Source", options);
     }
 }
 
