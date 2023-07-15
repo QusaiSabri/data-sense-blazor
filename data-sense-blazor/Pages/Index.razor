@@ -1,9 +1,11 @@
 ﻿@page "/"
 @using MudBlazor
 @using data_sense_blazor.Components
+@using data_sense_blazor.Components.NewConnectionDialog;
 @using data_sense_blazor.Interfaces;
 @inject AppState AppState
 @inject IJSRuntime JS
+@inject IDialogService DialogService
 @inject SQLServerDatabaseService DatabaseService;
 
 
@@ -13,14 +15,16 @@
             <MudStack>
                 <MudPaper Elevation="25">
                     <MudToolBar>
-                        <MudIconButton Icon="@Icons.Material.Outlined.PostAdd" Color="Color.Inherit" Class="mr-5" />
+                        <MudIconButton Icon="@Icons.Material.Outlined.Power" Color="Color.Inherit" @onclick="OpenNewConnectionDialog" />
                         <MudSpacer />
                         <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="Color.Inherit" />
                     </MudToolBar>
                 </MudPaper>
                 <MudSpacer />
                 <MudPaper Elevation="25">
-                    <DatabasesDropDown />
+                    <div class="@(AppState.IsConnected ? "" : "hidden")">
+                        <DatabasesDropDown />
+                    </div>
                 </MudPaper>
             </MudStack>
         </MudItem>
@@ -71,11 +75,13 @@
     protected override void OnInitialized()
     {
         AppState.OnColumnsSelectedChanged += StateHasChanged;
+        AppState.OnConnectionStatusChange += StateHasChanged;
     }
 
     public void Dispose()
     {
         AppState.OnColumnsSelectedChanged -= StateHasChanged;
+        AppState.OnConnectionStatusChange -= StateHasChanged;
     }
 
 
@@ -110,6 +116,12 @@
         var queryResult = await DatabaseService.ExecuteQuery(query);
         AppState.SetQueryResult(queryResult);
         AppState.OnQueryResultChange += StateHasChanged;
+    }
+
+    private void OpenNewConnectionDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<NewConnectionDialog>("Data Source", options);
     }
 }
 

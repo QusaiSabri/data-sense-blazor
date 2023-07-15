@@ -28,6 +28,14 @@
     <script src="_framework/blazor.webview.js" autostart="false"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="js/bundle.iife.js"></script>
+    <script>
+        document.addEventListener('keydown', (e) => {
+            e = e || window.event;
+            if (e.keyIdentifier == 'F5' || e.keyCode == 116 || (e.ctrlKey && e.keyCode == 82)) {
+                e.preventDefault();
+            }
+        });
+    </script>
 </body>
 
 </html>

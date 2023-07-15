@@ -1,17 +1,18 @@
 ﻿using System.Data;
 using data_sense_blazor.Interfaces;
 using data_sense_blazor.Models;
+using data_sense_blazor.Shared;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 
 public class SQLServerDatabaseService : IDatabaseService
 {
-    private readonly string _connectionString;
+    private readonly AppState _appState;
     private readonly ILogger<SQLServerDatabaseService> _logger;
 
-    public SQLServerDatabaseService(string connectionString, ILogger<SQLServerDatabaseService> logger)
+    public SQLServerDatabaseService(AppState appState, ILogger<SQLServerDatabaseService> logger)
     {
-        _connectionString = connectionString;
+        _appState = appState;
         _logger = logger;
         _logger.LogInformation("SQLServerDatabaseService started.");
     }
@@ -22,7 +23,7 @@ public class SQLServerDatabaseService : IDatabaseService
 
         var databases = new List<Database>();
 
-        using (var connection = new SqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_appState.ConnectionString))
         {
             await connection.OpenAsync();
 
@@ -54,7 +55,7 @@ public class SQLServerDatabaseService : IDatabaseService
 
         var tables = new List<Table>();
 
-        using (var connection = new SqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_appState.ConnectionString))
         {
             await connection.OpenAsync();
 
@@ -88,7 +89,7 @@ public class SQLServerDatabaseService : IDatabaseService
 
         var columns = new List<Column>();
 
-        using (var connection = new SqlConnection(_connectionString))
+        using (var connection = new SqlConnection(_appState.ConnectionString))
         {
             await connection.OpenAsync();
 
@@ -123,7 +124,7 @@ public class SQLServerDatabaseService : IDatabaseService
 
     public async Task<DataTable> ExecuteQuery(string query)
     {
-        var conn = new SqlConnection(_connectionString);
+        var conn = new SqlConnection(_appState.ConnectionString);
         DataTable dataTable = new DataTable();
 
         using (SqlCommand command = new SqlCommand(query, conn))
@@ -151,7 +152,7 @@ public class SQLServerDatabaseService : IDatabaseService
 
     public async Task<DataTable> ExecuteGroupBy(List<string> columns, Table table, string database)
     {
-        var conn = new SqlConnection(_connectionString);
+        var conn = new SqlConnection(_appState.ConnectionString);
 
         if (conn.State != ConnectionState.Open)
         {
