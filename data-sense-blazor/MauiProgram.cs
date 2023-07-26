@@ -30,7 +30,7 @@ public static class MauiProgram
         //string connectionString = configuration.GetConnectionString("DefaultConnection");
 
         builder.Services.AddSingleton<ILoggerFactory, LoggerFactory>();
-        builder.Services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+        builder.Services.AddScoped(typeof(ILogger<>), typeof(Logger<>));
 
         //builder.Services.AddSingleton(s => new SQLServerDatabaseService(connectionString, s.GetRequiredService<ILogger<SQLServerDatabaseService>>()));
         builder.Services.AddSingleton<SQLServerDatabaseService>(sp => new SQLServerDatabaseService(sp.GetRequiredService<AppState>(), sp.GetRequiredService<ILogger<SQLServerDatabaseService>>()));

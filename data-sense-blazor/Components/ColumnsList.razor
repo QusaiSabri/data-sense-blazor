@@ -1,33 +1,32 @@
 ﻿@using data_sense_blazor.Models;
 @using MudBlazor;
 @using data_sense_blazor.Interfaces;
-@inject AppState AppState
+@inherits ObservingComponentBase;
 @inject SQLServerDatabaseService DatabaseService;
 
 @if (columns != null)
 {
     <div class="mt-3 w-full">
         <MudSimpleTable Bordered="true" Style="overflow-x: auto;">
-                <thead>
-                    <tr>
-                        @foreach (var h in headings)
-                        {
-                            <th>@h</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
+            <thead>
+                <tr>
+                    @foreach (var h in headings)
+                    {
+                        <th>@h</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
                 @foreach (var column in columns)
                 {
-                        <tr>
-                            <td>@column.Name</td>
-                            @*<td><MudTextField @bind-Value="AliasColumnText"></MudTextField></td>*@
-                            <td><MudButton OnClick="() => OnPreviewButtonClicked(column.Name)" Variant="Variant.Outlined" Color="Color.Primary" Class="w-full col-span-3">Preview</MudButton></td>
-                            <td><MudCheckBox Checked="@column.IsChecked" CheckedChanged="(bool isChecked) => OnCheckboxClicked(column, isChecked)" Color="Color.Primary" Class="items-center col-span-1"></MudCheckBox></td>                            
-                        </tr>
-                    }
-                </tbody>
-            </MudSimpleTable>
+                    <tr>
+                        <td>@column.Name</td>
+                        <td><MudButton OnClick="() => OnPreviewButtonClicked(column.Name)" Variant="Variant.Outlined" Color="Color.Primary" Class="w-full col-span-3">Preview</MudButton></td>
+                        <td><MudCheckBox Checked="@column.IsChecked" CheckedChanged="(bool isChecked) => OnCheckboxClicked(column, isChecked)" Color="Color.Primary" Class="items-center col-span-1"></MudCheckBox></td>
+                    </tr>
+                }
+            </tbody>
+        </MudSimpleTable>
     </div>
 }
 
@@ -44,41 +43,61 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        Console.WriteLine("Entering OnParametersSetAsync");
+
         if (SelectedTable.Name != _selectedTable)
         {
-            columns = await DatabaseService.GetColumns(SelectedDatabase, SelectedTable.Name);
+            var columnsData = await DatabaseService.GetColumns(SelectedDatabase, SelectedTable.Name);
+            
+            columns = columnsData.Select(column => new Column
+                {
+                    Name = column.Name,
+                    IsChecked = AppState.ColumnsSelected.Contains(column.Name)
+                }).ToList();
+
+            
             _selectedTable = SelectedTable.Name;
-            ColumnsSelected = new List<string>();
+            ColumnsSelected = AppState.ColumnsSelected;
         }
+
+        Console.WriteLine("Exiting OnParametersSetAsync");
     }
 
     private async Task OnPreviewButtonClicked(string column)
     {
-        var columns = new List<string>();
-        columns.Add(column);
+        Console.WriteLine("Entering OnPreviewButtonClicked");
+        try
+        {
+            var columns = new List<string> { column };
+            var query = await DatabaseService.GenerateQuery(columns, SelectedTable, SelectedDatabase);
+            AppState.SetQuery(query);
 
-        var query = await DatabaseService.GenerateQuery(columns, SelectedTable, SelectedDatabase);
-        AppState.SetQuery(query);
-        AppState.OnQueryChange += StateHasChanged;
-        
-        var queryResult = await DatabaseService.ExecuteQuery(query);        
-        AppState.SetQueryResult(queryResult);
-        AppState.OnQueryResultChange += StateHasChanged;
+            var queryResult = await DatabaseService.ExecuteQuery(query);
+            AppState.SetQueryResult(queryResult);
+            
+        }
+        catch (InvalidOperationException e)
+        {
+            Console.WriteLine(e.Message);
+            throw;
+        }
+        Console.WriteLine("Exiting OnPreviewButtonClicked");
     }
 
     private void OnCheckboxClicked(Column column, bool isChecked)
     {
         column.IsChecked = isChecked;
+        var newColumnsSelected = new List<string>(AppState.ColumnsSelected);
         if (isChecked)
         {
-            AppState.AddToColumnsSelected(column.Name);
+            newColumnsSelected.Add(column.Name);
         }
         else
         {
-            AppState.RemoveFromColumnsSelected(column.Name);
+            newColumnsSelected.Remove(column.Name);
         }
-
-        AppState.OnColumnsSelectedChanged += StateHasChanged;
+        AppState.SetColumnsSelected(newColumnsSelected);
     }
+
 
 }
