@@ -1,34 +1,24 @@
 ﻿@using MudBlazor
 @using data_sense_blazor.Helpers;
-@inject AppState AppState
+@inherits ObservingComponentBase;
 
-@*<MudTextField Margin="Margin.Normal" @bind-Value="@QueryText" Variant="Variant.Text"></MudTextField>*@
 <code style="white-space: pre-line; font-family: monospace;">@FormattedQuery</code>
 
-
 @code {
-    private string QueryText { get; set; } = "";
     private string FormattedQuery { get; set; }
 
     protected override void OnInitialized()
     {
-        AppState.OnQueryChange += UpdateData;
         UpdateData();
     }
 
     private void UpdateData()
     {
-        if (AppState.Query.Length > 0)
+        if (!string.IsNullOrEmpty(AppState.Query))
         {
-            QueryText = AppState.Query;
-            FormattedQuery = DataTableHelper.FormatSQL(QueryText);
+            FormattedQuery = DataTableHelper.FormatSQL(AppState.Query);
         }
 
         StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        AppState.OnQueryChange -= UpdateData;
     }
 }

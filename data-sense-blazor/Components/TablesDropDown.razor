@@ -3,7 +3,7 @@
 @using data_sense_blazor.Components.Menus
 @using data_sense_blazor.Models;
 @using data_sense_blazor.Services;
-@inject AppState AppState;
+@inherits ObservingComponentBase;
 @inject SQLServerDatabaseService DatabaseService;
 
 <div class="flex">
@@ -27,7 +27,7 @@
     {
         if (SelectedDatabase != _selectedDatabase)
         {
-            SelectedTable = null;
+            SelectedTable = AppState.SelectedTable;
             tables = await DatabaseService.GetTables(SelectedDatabase);
             _selectedDatabase = SelectedDatabase;
         }

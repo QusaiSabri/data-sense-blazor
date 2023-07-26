@@ -74,16 +74,13 @@
 
     protected override void OnInitialized()
     {
-        AppState.OnColumnsSelectedChanged += StateHasChanged;
-        AppState.OnConnectionStatusChange += StateHasChanged;
+        AppState.RegisterStateChangeDelegate(StateHasChanged);
     }
 
     public void Dispose()
     {
-        AppState.OnColumnsSelectedChanged -= StateHasChanged;
-        AppState.OnConnectionStatusChange -= StateHasChanged;
+        AppState.UnregisterStateChangeDelegate(StateHasChanged);
     }
-
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -111,11 +108,9 @@
 
         var query = await DatabaseService.GenerateQuery(columns, SelectedTable, SelectedDatabase);
         AppState.SetQuery(query);
-        AppState.OnQueryChange += StateHasChanged;
 
         var queryResult = await DatabaseService.ExecuteQuery(query);
         AppState.SetQueryResult(queryResult);
-        AppState.OnQueryResultChange += StateHasChanged;
     }
 
     private void OpenNewConnectionDialog()
@@ -124,4 +119,3 @@
         var dialog = DialogService.Show<NewConnectionDialog>("Data Source", options);
     }
 }
-

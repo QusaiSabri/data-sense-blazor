@@ -2,17 +2,17 @@
 @using MudBlazor
 @using data_sense_blazor.Models;
 @using data_sense_blazor.Services;
-@inject AppState AppState
+@inherits ObservingComponentBase;
 @inject SQLServerDatabaseService DatabaseService
 
-<MudAutocomplete ValueChanged="OnDatabaseSelected" T="string" Label="Databasess" Value="@SelectedDatabase" SearchFunc="@Search" Variant="Variant.Outlined" Clearable=true Strict=false />
+<MudAutocomplete ValueChanged="OnDatabaseSelected" T="string" Label="Databasess" Value="@AppState.SelectedDatabase" SearchFunc="@Search" Variant="Variant.Outlined" Clearable=true Strict=false />
 
-@if (!string.IsNullOrEmpty(SelectedDatabase))
+@if (!string.IsNullOrEmpty(@AppState.SelectedDatabase))
 {
     <MudTabs KeepPanelsAlive="true" MinimumTabWidth="20px" Rounded="true" Centered="true" Outlined="true" Border="true">
         <MudTabPanel Text="Tables" >
             <ChildContent>
-                <TablesDropDown SelectedDatabase="@SelectedDatabase" />
+                <TablesDropDown SelectedDatabase="@AppState.SelectedDatabase" />
             </ChildContent>
         </MudTabPanel>
         <MudTabPanel Text="Stored Procedures">
@@ -35,12 +35,22 @@
 }
 
 @code {
-    private string SelectedDatabase;
     private List<string> databases;
 
     protected override void OnInitialized()
     {
-        AppState.OnConnectionStatusChange += OnConnectionStatusChanged;
+        if (AppState.IsConnected && (AppState.Databases == null || !AppState.Databases.Any()))
+        {
+            LoadDatabases();
+        }
+    }
+
+    private void HandleAppStateChange()
+    {
+        if (AppState.IsConnected && AppState.Databases == null)
+        {
+            LoadDatabases();
+        }
     }
 
     private void OnConnectionStatusChanged()
@@ -50,30 +60,28 @@
             LoadDatabases();
         }
     }
+
     private Task<IEnumerable<string>> Search(string value)
     {
         if (string.IsNullOrEmpty(value))
-            return Task.FromResult(databases.AsEnumerable());
+            return Task.FromResult(AppState.Databases.AsEnumerable());
 
-        var res = databases.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        var res = AppState.Databases.Where(x => x.Contains(value, StringComparison.InvariantCultureIgnoreCase));
         return Task.FromResult(res.AsEnumerable());
     }
 
     private async void LoadDatabases()
     {
-        var databases = await DatabaseService.GetDatabases();
-        this.databases = databases.Select(db => db.Name).ToList();
-        this.StateHasChanged();
+        if (!AppState.Databases.Any())
+        {
+            var databases = await DatabaseService.GetDatabases();
+            AppState.SetDatabases(databases.Select(db => db.Name).ToList());
+        }
     }
 
     private void OnDatabaseSelected(string value)
     {
-        SelectedDatabase = value;
         AppState.SetSelectedDatabase(value);
     }
 
-    public void Dispose()
-    {
-        AppState.OnConnectionStatusChange -= OnConnectionStatusChanged;
-    }
 }

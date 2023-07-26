@@ -1,6 +1,9 @@
 ﻿@using data_sense_blazor.Enums;
 @using data_sense_blazor.Interfaces;
 @using data_sense_blazor.Models;
+@inject AppState AppState
+@inject SQLServerDatabaseService DatabaseService
+
 <MudDialog Class="w-9/12">
     <DialogContent>
         <MudPaper  Elevation="0" Class="p-1">
@@ -56,6 +59,11 @@
         {
             MudDialog.Close(DialogResult.Ok(true));
             MudDialog.CancelAll();
+            if (!AppState.Databases.Any())
+            {
+                var databases = await DatabaseService.GetDatabases();
+                AppState.SetDatabases(databases.Select(db => db.Name).ToList());
+            }
 
         } else
         {

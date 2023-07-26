@@ -1,77 +1,96 @@
 ﻿using System.Data;
 using data_sense_blazor.Models;
+using System.Collections.Generic;
 
 namespace data_sense_blazor.Shared
 {
     public class AppState
     {
+        private List<Action> Observers = new List<Action>();
         public string ConnectionString { get; private set; } = String.Empty;
         public bool IsConnected { get; private set; } = false;
+        public List<string> Databases { get; private set; } = new List<string>();
         public string Query { get; private set; } = String.Empty;
         public DataTable QueryResult { get; private set; } = new DataTable();
         public List<string> ColumnsSelected { get; private set; } = new List<string>();
-        public Table SelectedTable { get; private set; } = new Table();
         public string SelectedDatabase { get; private set; } = String.Empty;
-
-        public event Action OnConnectionStringChange;
-        public event Action OnConnectionStatusChange;
-        public event Action OnQueryResultChange;
-        public event Action OnQueryChange;
-        public event Action OnColumnsSelectedChanged;
-        public event Action OnSelectedTableChange;
-        public event Action OnSelectedDatabaseChange;
+        public Table SelectedTable { get; private set; } = new Table();
 
         public void SetConnectionString(string connectionString)
         {
             ConnectionString = connectionString;
-            OnConnectionStringChange?.Invoke();
+            NotifyStateChanged();
         }
+
         public void SetConnectionStatus(bool status)
         {
             IsConnected = status;
-            OnConnectionStatusChange?.Invoke();
+            NotifyStateChanged();
+        }
+        public void SetDatabases(List<string> databases)
+        {
+            Databases = databases;
+            NotifyStateChanged();
         }
         public void AddToColumnsSelected(string column)
         {
             ColumnsSelected.Add(column);
-            OnColumnsSelectedChanged?.Invoke();
+            NotifyStateChanged();
         }
 
         public void RemoveFromColumnsSelected(string column)
         {
             ColumnsSelected.Remove(column);
-            OnColumnsSelectedChanged?.Invoke();
+            NotifyStateChanged();
         }
-
 
         public void SetQueryResult(DataTable queryResult)
         {
             QueryResult = queryResult;
-            OnQueryResultChange?.Invoke();
+            NotifyStateChanged();
         }
 
         public void SetQuery(string query)
         {
             Query = query;
-            OnQueryChange?.Invoke();
+            NotifyStateChanged();
         }
 
         public void SetColumnsSelected(List<string> columnsSelected)
         {
             ColumnsSelected = columnsSelected;
-            OnColumnsSelectedChanged?.Invoke();
+            NotifyStateChanged();
         }
 
         public void SetSelectedTable(Table selectedTable)
         {
             SelectedTable = selectedTable;
-            OnSelectedTableChange?.Invoke();
+            NotifyStateChanged();
         }
 
         public void SetSelectedDatabase(string selectedDatabase)
         {
             SelectedDatabase = selectedDatabase;
-            OnSelectedDatabaseChange?.Invoke();
+            NotifyStateChanged();
+        }
+
+        public void RegisterStateChangeDelegate(Action stateHasChanged)
+        {
+            Observers.Add(stateHasChanged);
+        }
+
+        public void UnregisterStateChangeDelegate(Action stateHasChanged)
+        {
+            Observers.Remove(stateHasChanged);
+        }
+
+        private void NotifyStateChanged()
+        {
+            foreach (var observer in Observers)
+            {
+                Console.WriteLine("Invoking observer: " + observer.Method.Name);
+                observer.Invoke();
+            }
         }
 
     }
