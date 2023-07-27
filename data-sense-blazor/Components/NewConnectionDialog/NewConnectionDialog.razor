@@ -3,7 +3,7 @@
 @using data_sense_blazor.Interfaces;
 @inject IDialogService DialogService
 @inject IServiceProvider services
-
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
 
 <MudDialog>
     <DialogContent>
@@ -28,16 +28,33 @@
     [CascadingParameter]
     MudDialogInstance MudDialog { get; set; }
     public MudListItem SelectedItem { get; set; }
+    public string DataSourceTextValue { get; set; }
 
     void Cancel() => MudDialog.Cancel();
 
-    private void OpenSecondDialog()
+    protected override async Task OnInitializedAsync()
     {
-        IDatabaseConnectionService connectionService = ConnectionServiceFactory.GetConnectionService(SelectedItem.Value.ToString(), services);
+        DataSourceTextValue = await LocalStorage.GetItemAsync<string>("DataSourceTextValue") ?? String.Empty;
+        if (!String.IsNullOrEmpty(DataSourceTextValue))
+        {
+            await OpenSecondDialog();
+        }
+    }
+
+    private async Task OpenSecondDialog()
+    {
+        if (String.IsNullOrEmpty(DataSourceTextValue) && !String.IsNullOrEmpty(SelectedItem.Value.ToString()))
+        {
+            DataSourceTextValue = SelectedItem.Value.ToString();         
+            await LocalStorage.SetItemAsync("DataSourceTextValue", DataSourceTextValue);
+        }
+
+        IDatabaseConnectionService connectionService = ConnectionServiceFactory.GetConnectionService(DataSourceTextValue, services);
 
         var parameters = new DialogParameters<ServerConnectionDetails>();
-        parameters.Add(x => x.DataSourceType, SelectedItem.Value.ToString());
+        parameters.Add(x => x.DataSourceType, DataSourceTextValue);
         parameters.Add(x => x.ConnectionService, connectionService);
+
         DialogService.Show<ServerConnectionDetails>("Connect to Server", parameters);
     }
 }
