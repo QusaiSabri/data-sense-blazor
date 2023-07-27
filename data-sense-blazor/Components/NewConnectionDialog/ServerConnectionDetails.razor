@@ -3,6 +3,8 @@
 @using data_sense_blazor.Models;
 @inject AppState AppState
 @inject SQLServerDatabaseService DatabaseService
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+
 
 <MudDialog Class="w-9/12">
     <DialogContent>
@@ -57,6 +59,9 @@
         var (isConnected, message) = await ConnectionService.Connect(databaseConfiguration);
         if (isConnected)
         {
+            await LocalStorage.SetItemAsync("databaseConfiguration", databaseConfiguration);
+            await LocalStorage.SetItemAsync("AuthenticationType", enumValue);
+
             MudDialog.Close(DialogResult.Ok(true));
             MudDialog.CancelAll();
             if (!AppState.Databases.Any())
@@ -69,13 +74,22 @@
         {
             MudDialog.Close(DialogResult.Ok(false));
         }
-        
+
     }
 
     protected override void OnInitialized()
     {
         databaseConfiguration ??= new DatabaseConfiguration();
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        databaseConfiguration = await LocalStorage.GetItemAsync<DatabaseConfiguration>("databaseConfiguration") ?? new DatabaseConfiguration();
+        enumValue = await LocalStorage.GetItemAsync<AuthenticationEnum>("AuthenticationType");
+
+        StateHasChanged();        
+    }
+
 
     void ButtonTestclick()
     {

@@ -1,4 +1,5 @@
-﻿using data_sense_blazor.Data;
+﻿using Blazored.LocalStorage;
+using data_sense_blazor.Data;
 using data_sense_blazor.Services;
 using data_sense_blazor.Shared;
 using Microsoft.Extensions.Logging;
@@ -38,6 +39,7 @@ public static class MauiProgram
         builder.Services.AddScoped<SqlServerConnectionService>();
         builder.Services.AddMauiBlazorWebView();
         builder.Services.AddMudServices();
+        builder.Services.AddBlazoredLocalStorage();
         //builder.Services.AddScoped<SQLServerDatabaseService>();
         builder.Services.AddSingleton<AppState>();
 
