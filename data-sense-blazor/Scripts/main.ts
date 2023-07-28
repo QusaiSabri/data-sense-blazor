@@ -9,7 +9,7 @@ export function setupSplit(horizontalPaneSelectors: string[], verticalPaneSelect
         cursor: 'col-resize',
         sizes: [30, 70],
         minSize: [200, 400],
-        onDragEnd: () => updateMudTableHeight()
+        onDrag: () => updateresultStatsBarWidth()
     });
 
     Split(verticalSelectors, {
@@ -34,6 +34,19 @@ export function updateMudTableHeight(): void {
 
     }
 }
+export function updateresultStatsBarWidth(): void {
+    const tableContainer = document.getElementById('dataSenseBottomRightPane');
+    const greenBar = document.getElementById('resultStatsBar');
+
+    if (tableContainer && greenBar) {
+        const tableContainerWidth = tableContainer.getBoundingClientRect().width;
+        greenBar.style.width = `${tableContainerWidth - 12}px`;
+    }
+}
+
+
 
 (window as any).setupSplit = setupSplit;
 (window as any).updateMudTableHeight = updateMudTableHeight;
+(window as any).updateresultStatsBarWidth = updateresultStatsBarWidth;
+

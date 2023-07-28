@@ -22,6 +22,10 @@
         </RowTemplate>
     </MudTable>
 }
+<div id="resultStatsBar" class="flex justify-end gap-4 px-2 py-1 w-full absolute bottom-0 bg-gray-300">
+        <div class="border-r border-gray-200 pr-4">@(AppState.SelectedDatabase)</div>
+        <div>@Data.Count rows</div>
+    </div>
 
 @code {
     private List<Dictionary<string, object>> Data = new List<Dictionary<string, object>>();

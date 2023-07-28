@@ -1,6 +1,6 @@
 ﻿@using MudBlazor
 @using data_sense_blazor.Helpers;
-@inherits ObservingComponentBase;
+@inject AppState AppState
 
 <code style="white-space: pre-line; font-family: monospace;">@FormattedQuery</code>
 
@@ -8,6 +8,12 @@
     private string FormattedQuery { get; set; }
 
     protected override void OnInitialized()
+    {
+        AppState.RegisterStateChangeDelegate(UpdateData);
+        UpdateData();
+    }
+
+    protected override void OnParametersSet()
     {
         UpdateData();
     }
@@ -20,5 +26,10 @@
         }
 
         StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        AppState.UnregisterStateChangeDelegate(UpdateData);
     }
 }

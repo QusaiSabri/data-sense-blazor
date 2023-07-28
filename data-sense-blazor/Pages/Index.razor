@@ -3,13 +3,13 @@
 @using data_sense_blazor.Components
 @using data_sense_blazor.Components.NewConnectionDialog;
 @using data_sense_blazor.Interfaces;
-@inject AppState AppState
+@inherits ObservingComponentBase;
 @inject IJSRuntime JS
 @inject IDialogService DialogService
 @inject SQLServerDatabaseService DatabaseService;
 
 
-<MudGrid Spacing="2" Justify="Justify.FlexStart" Class="h-screen split flex-nowrap">
+<MudGrid Justify="Justify.FlexStart" Class="h-screen split flex-nowrap">
     <div id="dataSenseLeftPane">
         <MudItem xs="12" Class="overflow-auto" style="height: calc(100vh - 100px);">
             <MudStack>
@@ -23,11 +23,14 @@
                 <MudSpacer />
                 <MudPaper Elevation="25">
                     <div class="@(AppState.IsConnected ? "" : "hidden")">
-                        <DatabasesDropDown />
+                        <DatabasesDropDown />                        
                     </div>
                 </MudPaper>
             </MudStack>
         </MudItem>
+        <div class="@(AppState.IsConnected ? "absolute bottom-0 rounded-md px-2 py-1 bg-green-300" : "hidden")">
+            <div class="text-xs">Connected.</div>
+        </div>
     </div>
     <div id="dataSenseRightPane">
         <MudItem xs="12" Class="overflow-auto" style="height: calc(100vh - 100px);">
@@ -54,11 +57,11 @@
                 </MudContainer>
             </div>
             <div id="dataSenseBottomRightPane" class="overflow-x-auto">
-                <MudContainer Fixed="true">
+                <MudContainer Class="max-w-full">
                     <ResultsTable />
                 </MudContainer>
             </div>
-        </MudItem>
+        </MudItem>        
     </div>
 </MudGrid>
 
@@ -70,16 +73,6 @@
     void ToggleDrawer()
     {
         open = !open;
-    }
-
-    protected override void OnInitialized()
-    {
-        AppState.RegisterStateChangeDelegate(StateHasChanged);
-    }
-
-    public void Dispose()
-    {
-        AppState.UnregisterStateChangeDelegate(StateHasChanged);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -97,6 +90,7 @@
              });
 
             await JS.InvokeVoidAsync("updateMudTableHeight");
+            await JS.InvokeVoidAsync("updateresultStatsBarWidth");
         }
     }
 
