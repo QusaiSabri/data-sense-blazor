@@ -12,7 +12,11 @@
     <MudTabs KeepPanelsAlive="true" MinimumTabWidth="20px" Rounded="true" Centered="true" Outlined="true" Border="true">
         <MudTabPanel Text="Tables" >
             <ChildContent>
-                <TablesDropDown SelectedDatabase="@AppState.SelectedDatabase" />
+                <MudExpansionPanels MultiExpansion="true">
+                    <MudExpansionPanel Text="@AppState.SelectedTable.Name">
+                        <TablesDropDown SelectedDatabase="@AppState.SelectedDatabase" />
+                    </MudExpansionPanel>
+                </MudExpansionPanels>
             </ChildContent>
         </MudTabPanel>
         <MudTabPanel Text="Stored Procedures">
